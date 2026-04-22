@@ -20,8 +20,10 @@ const Vector = () => {
     }
 
     const path = e.target.closest('[id]');
-    const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
-    if (!path || excludedIds.includes(path.id)) return;
+    if (Object.keys(markers).length >= 4) {
+      alert("Maksimal 4 tanda diperbolehkan agar laporan tetap ringkas.");
+      return;
+    }
 
     // Selalu buat tanda baru jika klik di area kosong mobil
     const svg = path.ownerSVGElement;
@@ -57,6 +59,11 @@ const Vector = () => {
       const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
       setMarkers(prev => {
+        if (Object.keys(prev).length >= 4) {
+          alert("Maksimal 4 tanda diperbolehkan.");
+          return prev;
+        }
+
         const newId = Date.now();
         const partName = path.id.replace(/-/g, ' ').toUpperCase();
         
