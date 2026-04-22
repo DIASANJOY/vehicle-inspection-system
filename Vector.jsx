@@ -54,7 +54,7 @@ const Vector = () => {
       <p className="subtitle">Klik 1x: ✓ LULUS | Klik 2x: ✕ CACAT</p>
 
       <div className="main-stage">
-        <button className="btn-nav" onClick={() => setView('front')}>❮</button>
+        <button className="btn-nav" onClick={() => setView(v => v === 'front' ? 'back' : 'front')}>❮</button>
 
         <div className="car-card">
           <div className="badge">{view === 'front' ? 'FRONT PANEL' : 'REAR PANEL'}</div>
@@ -90,7 +90,7 @@ const Vector = () => {
           </div>
         </div>
 
-        <button className="btn-nav" onClick={() => setView('back')}>❯</button>
+        <button className="btn-nav" onClick={() => setView(v => v === 'front' ? 'back' : 'front')}>❯</button>
       </div>
 
       <div className="info-bar">
