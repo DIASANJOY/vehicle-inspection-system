@@ -1210,29 +1210,35 @@
 
 @media (max-width: 900px) {
   .data-view-content {
-    max-width: 95%;
-    width: 95%;
-    height: 90vh;
-    max-height: 90vh;
-    border-radius: 15px;
+    max-width: 90%;
+    width: 90%;
+    height: 85vh;
+    max-height: 85vh;
+    border-radius: 20px;
+    margin: auto;
   }
 
   .data-view-header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 15px;
-    padding: 20px;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 20px;
+    padding: 25px 20px;
   }
   
   .header-main-title {
-    align-items: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;
+    text-align: center !important;
   }
 
   .header-buttons {
-    flex-direction: column;
+    flex-direction: column !important;
     gap: 15px;
     width: 100%;
+    align-items: center !important;
   }
   
   .tab-buttons {
@@ -1242,21 +1248,22 @@
   
   .tab-btn {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
+    font-size: 12px;
   }
   
   .action-buttons {
     width: 100%;
-    justify-content: center;
+    justify-content: center !important;
     order: 1;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   .inspection-table {
     display: block;
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   .inspection-table th, .inspection-table td {
@@ -1282,22 +1289,26 @@
 
 @media (max-width: 480px) {
   .data-view-content {
-    width: 98%;
-    max-width: 98%;
-    height: 95vh;
+    width: 92%;
+    max-width: 92%;
+    height: 80vh;
+  }
+
+  .data-view-header {
+    padding: 20px 15px;
+    gap: 15px;
   }
 
   .overall-badge {
     font-size: 10px;
-    padding: 6px 12px;
-  }
-
-  .header-buttons {
-    width: 100%;
+    padding: 6px 10px;
+    white-space: normal;
+    line-height: 1.4;
   }
 
   .action-buttons {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
     gap: 8px;
@@ -1305,8 +1316,8 @@
 
   .action-buttons .export-btn {
     flex: 1;
-    min-width: 80px;
-    padding: 10px 5px;
+    min-width: 90px;
+    padding: 8px 4px;
     font-size: 10px;
   }
 
@@ -1314,9 +1325,9 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 }
 
