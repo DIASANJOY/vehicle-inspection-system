@@ -190,66 +190,66 @@ const Vector = () => {
                 );
               })}
 
-              {/* Pop-up Cepat (Quick Action) dengan Smart Positioning */}
-              {activePopup && (
-                <foreignObject 
-                  x={activePopup.x - 100} 
-                  y={activePopup.y < 180 ? activePopup.y + 30 : activePopup.y - 170} 
-                  width="200" 
-                  height="160"
-                  style={{ overflow: 'visible' }}
-                >
-                  <div className="quick-popup">
-                    <div className="popup-header">
-                      <span>{activePopup.partName}</span>
-                      <button onClick={() => setActivePopup(null)}>✕</button>
-                    </div>
-                    <div className="popup-actions">
-                      <button 
-                        className={`action-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
-                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' }}))}
-                      >✓</button>
-                      <button 
-                        className={`action-btn cross ${markers[activePopup.id]?.type === 'cross' ? 'active' : ''}`}
-                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' }}))}
-                      >✕</button>
-                      <button 
-                        className="action-btn delete"
-                        onClick={() => {
-                          setMarkers(prev => {
-                            const n = { ...prev };
-                            delete n[activePopup.id];
-                            return n;
-                          });
-                          setActivePopup(null);
-                        }}
-                      >🗑</button>
-                    </div>
-                    <input 
-                      type="text" 
-                      className="popup-input"
-                      placeholder="Tulis catatan kerusakan..."
-                      value={markers[activePopup.id]?.note || ""}
-                      onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
-                      autoFocus
-                    />
-                    <button 
-                      className="popup-save-btn"
-                      onClick={() => setActivePopup(null)}
-                    >
-                      SIMPAN & KEMBALI
-                    </button>
-                  </div>
-                </foreignObject>
-              )}
             </svg>
 
-            {/* Overlay untuk menutup pop-up jika klik di luar */}
+            {/* Pop-up Cepat (Quick Action) - Sekarang di Luar SVG agar tidak terpotong & bisa diklik */}
             {activePopup && (
-              <div 
-                className="popup-overlay" 
-                onClick={() => setActivePopup(null)}
-              />
+              <>
+                <div 
+                  className="popup-overlay" 
+                  onClick={() => setActivePopup(null)}
+                />
+                <div 
+                  className="quick-popup"
+                  style={{
+                    position: 'absolute',
+                    left: `${(activePopup.x / (view === 'front' ? 700.72 : 674.58)) * 100}%`,
+                    top: `${(activePopup.y / (view === 'front' ? 568.24 : 595.24)) * 100}%`,
+                    transform: `translate(-50%, ${activePopup.y < 180 ? '20px' : '-110%'})`,
+                    zIndex: 100
+                  }}
+                >
+                  <div className="popup-header">
+                    <span>{activePopup.partName}</span>
+                    <button onClick={() => setActivePopup(null)}>✕</button>
+                  </div>
+                  <div className="popup-actions">
+                    <button 
+                      className={`action-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
+                      onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' }}))}
+                    >✓</button>
+                    <button 
+                      className={`action-btn cross ${markers[activePopup.id]?.type === 'cross' ? 'active' : ''}`}
+                      onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' }}))}
+                    >✕</button>
+                    <button 
+                      className="action-btn delete"
+                      onClick={() => {
+                        setMarkers(prev => {
+                          const n = { ...prev };
+                          delete n[activePopup.id];
+                          return n;
+                        });
+                        setActivePopup(null);
+                      }}
+                    >🗑</button>
+                  </div>
+                  <input 
+                    type="text" 
+                    className="popup-input"
+                    placeholder="Tulis catatan kerusakan..."
+                    value={markers[activePopup.id]?.note || ""}
+                    onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
+                    autoFocus
+                  />
+                  <button 
+                    className="popup-save-btn"
+                    onClick={() => setActivePopup(null)}
+                  >
+                    SIMPAN & KEMBALI
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
