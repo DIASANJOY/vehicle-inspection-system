@@ -5,13 +5,24 @@ import BackSVG from './assets/suv-back.svg?react';
 
 const Vector = () => {
   const [view, setView] = useState('front');
-  const [markers, setMarkers] = useState({});
+  const [markers, setMarkers] = useState(() => {
+    const saved = localStorage.getItem('vehicle_markers');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [hoverName, setHoverName] = useState("");
   const [activePopup, setActivePopup] = useState(null); // { id, x, y }
+  const [showDataView, setShowDataView] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("Copy JSON");
+  const [dataTab, setDataTab] = useState('table'); // 'table' | 'json'
 
   // Timer untuk deteksi Long Press
   const pressTimer = React.useRef(null);
   const isLongPress = React.useRef(false); // Flag untuk mencegah klik setelah hold
+
+  // Save to localStorage
+  React.useEffect(() => {
+    localStorage.setItem('vehicle_markers', JSON.stringify(markers));
+  }, [markers]);
 
   const handleAction = (e) => {
     if (activePopup || isLongPress.current) {
@@ -362,10 +373,155 @@ const Vector = () => {
         </div>
 
         {/* Baris 2: Tombol Aksi */}
-        <button className="footer-bar submit-bar" onClick={() => alert("Laporan Terkirim!")}>
-          📩 KIRIM LAPORAN INSPEKSI
-        </button>
+        <div className="footer-actions">
+          <button className="footer-bar data-btn" onClick={() => setShowDataView(!showDataView)}>
+            {showDataView ? "📊 KEMBALI KE VISUAL" : "📋 LIHAT DATA TABLE"}
+          </button>
+          <button className="footer-bar submit-bar" onClick={() => {
+            setShowDataView(true);
+            setTimeout(() => {
+              alert("Data siap untuk diekspor! Silakan salin JSON atau download file.");
+            }, 500);
+          }}>
+            📩 KIRIM / EXPORT DATA
+          </button>
+        </div>
       </div>
+
+      {/* MODAL DATA VIEW */}
+      {showDataView && (
+        <div className="data-view-overlay">
+          <div className="data-view-content">
+            <div className="data-view-header">
+              <div className="header-main-title">
+                <h3>DATA HASIL INSPEKSI</h3>
+                {Object.values(markers).length > 0 && (
+                  <span className={`overall-badge ${Object.values(markers).some(m => m.type === 'cross') ? 'failed' : 'passed'}`}>
+                    KESIMPULAN: {Object.values(markers).some(m => m.type === 'cross') ? 'CACAT (PERLU PERBAIKAN)' : 'LULUS (KONDISI BAIK)'}
+                  </span>
+                )}
+              </div>
+              <div className="header-buttons">
+                <div className="tab-buttons">
+                  <button 
+                    className={`tab-btn ${dataTab === 'table' ? 'active' : ''}`}
+                    onClick={() => setDataTab('table')}
+                  >📊 TABLE</button>
+                  <button 
+                    className={`tab-btn ${dataTab === 'json' ? 'active' : ''}`}
+                    onClick={() => setDataTab('json')}
+                  >{"{ }"} JSON</button>
+                </div>
+                <div className="action-buttons">
+                <button className="export-btn reset" onClick={() => {
+                  if (window.confirm("Hapus semua data inspeksi?")) {
+                    setMarkers({});
+                    localStorage.removeItem('vehicle_markers');
+                  }
+                }} style={{ background: '#fff5f5', color: '#c53030', border: '1px solid #feb2b2' }}>Reset</button>
+                
+                <button className="export-btn copy" onClick={() => {
+                  navigator.clipboard.writeText(JSON.stringify(markers, null, 2));
+                  setCopyStatus("Copied! ✅");
+                  setTimeout(() => setCopyStatus("Copy JSON"), 2000);
+                }} style={{ background: '#ebf8ff', color: '#2b6cb0', border: '1px solid #bee3f8' }}>
+                  {copyStatus}
+                </button>
+
+                <button className="export-btn json" onClick={() => {
+                  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(markers, null, 2));
+                  const downloadAnchorNode = document.createElement('a');
+                  downloadAnchorNode.setAttribute("href",     dataStr);
+                  downloadAnchorNode.setAttribute("download", "inspection_data.json");
+                  document.body.appendChild(downloadAnchorNode);
+                  downloadAnchorNode.click();
+                  downloadAnchorNode.remove();
+                }}>Download JSON</button>
+                <button className="close-data-btn" onClick={() => setShowDataView(false)}>✕</button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="data-view-body">
+              {dataTab === 'table' ? (
+                <div className="data-table-container">
+                  <table className="inspection-table">
+                    <thead>
+                      <tr>
+                        <th>Panel / Bagian</th>
+                        <th>View</th>
+                        <th>Status Akhir</th>
+                        <th>Jumlah Tanda</th>
+                        <th>Catatan Terakumulasi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const grouped = {};
+                        Object.values(markers).forEach(m => {
+                          if (!grouped[m.pathId]) {
+                            grouped[m.pathId] = { 
+                              partName: m.partName, 
+                              view: m.view, 
+                              type: 'tick', 
+                              count: 0, 
+                              notes: [] 
+                            };
+                          }
+                          grouped[m.pathId].count++;
+                          if (m.type === 'cross') grouped[m.pathId].type = 'cross';
+                          if (m.note) grouped[m.pathId].notes.push(m.note);
+                        });
+
+                        const rows = Object.values(grouped);
+                        if (rows.length === 0) {
+                          return (
+                            <tr>
+                              <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#a0aec0' }}>
+                                Belum ada data inspeksi.
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        return rows.map((panel, idx) => (
+                          <tr key={idx}>
+                            <td className="part-cell">{panel.partName}</td>
+                            <td>{panel.view.toUpperCase()}</td>
+                            <td>
+                              <span className={`status-badge ${panel.type}`}>
+                                {panel.type === 'tick' ? 'LULUS' : 'CACAT'}
+                              </span>
+                            </td>
+                            <td>{panel.count} tanda</td>
+                            <td className="note-cell">
+                              {panel.notes.length > 0 ? panel.notes.join(" | ") : "-"}
+                            </td>
+                          </tr>
+                        ));
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="json-preview-section">
+                  <div className="json-header">
+                    <h4>JSON Output (Backend Ready)</h4>
+                    <button className="copy-json-inline" onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(markers, null, 2));
+                      setCopyStatus("Copied! ✅");
+                      setTimeout(() => setCopyStatus("Copy JSON"), 2000);
+                    }}>{copyStatus}</button>
+                  </div>
+                  <pre className="json-preview full-height">
+                    {JSON.stringify(markers, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
