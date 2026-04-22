@@ -8,13 +8,13 @@ const Vector = () => {
   const [markers, setMarkers] = useState({});
   const [hoverName, setHoverName] = useState("");
   const [activePopup, setActivePopup] = useState(null); // { id, x, y }
-  
+
   // Timer untuk deteksi Long Press
   const pressTimer = React.useRef(null);
 
   const handleAction = (e) => {
-    if (activePopup) return; 
-    
+    if (activePopup) return;
+
     const path = e.target.closest('[id]');
     const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
     if (!path || excludedIds.includes(path.id)) return;
@@ -33,16 +33,16 @@ const Vector = () => {
         point.y = e.clientY;
         const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-        newMarkers[key] = { 
-          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
-          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
+        newMarkers[key] = {
+          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y,
+          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase()
         };
-      } else if (currentMarker.type === 'tick') {
-        // Klik 2: Ubah ke Cross (Catatan tetap aman)
-        newMarkers[key] = { ...currentMarker, type: 'cross' };
       } else {
-        // Klik 3: Hapus
-        delete newMarkers[key];
+        // Klik 2, 3, dst: Toggle antara Tick <-> Cross (Data Aman)
+        newMarkers[key] = { 
+          ...currentMarker, 
+          type: currentMarker.type === 'tick' ? 'cross' : 'tick' 
+        };
       }
       return newMarkers;
     });
@@ -70,9 +70,9 @@ const Vector = () => {
           setActivePopup({ id: key, x: prev[key].x, y: prev[key].y, partName: prev[key].partName });
           return prev;
         }
-        const newMarker = { 
-          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
-          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
+        const newMarker = {
+          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y,
+          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase()
         };
         setActivePopup({ id: key, x: transformedPoint.x, y: transformedPoint.y, partName: newMarker.partName });
         return { ...prev, [key]: newMarker };
@@ -89,19 +89,19 @@ const Vector = () => {
     setMarkers(prev => {
       const currentMarker = prev[key];
       if (!currentMarker) return prev;
-      
+
       const newMarkers = { ...prev };
-      if (currentMarker.type === 'tick') {
-        newMarkers[key] = { ...currentMarker, type: 'cross' };
-      } else {
-        delete newMarkers[key];
-      }
+      // Toggle antara Tick <-> Cross (Agar catatan tidak hilang)
+      newMarkers[key] = { 
+        ...currentMarker, 
+        type: currentMarker.type === 'tick' ? 'cross' : 'tick' 
+      };
       return newMarkers;
     });
   };
 
   const openPopup = (e, markerId) => {
-    if (e) e.stopPropagation(); 
+    if (e) e.stopPropagation();
     const m = markers[markerId];
     if (m) {
       setActivePopup({ id: markerId, x: m.x, y: m.y, partName: m.partName });
@@ -163,10 +163,10 @@ const Vector = () => {
 
         <div className="car-card">
           <div className="badge">{view === 'front' ? 'FRONT PANEL' : 'REAR PANEL'}</div>
-          
+
           <div className="svg-container">
             {/* Gambar Mobil (SVG yang di-import) */}
-            <CurrentSVG 
+            <CurrentSVG
               className="car-svg"
               onClick={handleAction}
               onPointerDown={handlePointerDown}
@@ -181,8 +181,8 @@ const Vector = () => {
                 const m = markers[id];
                 if (m.view !== view) return null;
                 return (
-                  <g 
-                    key={id} 
+                  <g
+                    key={id}
                     transform={`translate(${m.x}, ${m.y})`}
                     onClick={(e) => cycleMarker(e, id)}
                     onContextMenu={(e) => {
@@ -192,18 +192,18 @@ const Vector = () => {
                     className="marker-group"
                   >
                     <circle r="18" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="2" />
-                    <text 
+                    <text
                       className={`symbol ${m.type}`}
-                      textAnchor="middle" 
+                      textAnchor="middle"
                       dominantBaseline="middle"
-                      dy=".1em" 
+                      dy=".1em"
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
                     {/* Ikon/Balon Catatan (Toggle Show/Hide) */}
                     {m.note && (
-                      <g 
-                        transform="translate(0, -40)" 
+                      <g
+                        transform="translate(0, -40)"
                         onClick={(e) => {
                           e.stopPropagation();
                           setMarkers(prev => ({
@@ -222,19 +222,19 @@ const Vector = () => {
                         ) : (
                           // Tampilan Teks Lengkap saat diklik
                           <g>
-                            <rect 
-                              x={-(m.note.length * 3.5 + 10)} 
-                              y="-12" 
-                              width={m.note.length * 7 + 20} 
-                              height="22" 
-                              rx="6" 
-                              fill="rgba(0,0,0,0.9)" 
+                            <rect
+                              x={-(m.note.length * 3.5 + 10)}
+                              y="-12"
+                              width={m.note.length * 7 + 20}
+                              height="22"
+                              rx="6"
+                              fill="rgba(0,0,0,0.9)"
                             />
-                            <text 
-                              fill="white" 
-                              fontSize="10" 
+                            <text
+                              fill="white"
+                              fontSize="10"
                               fontWeight="600"
-                              textAnchor="middle" 
+                              textAnchor="middle"
                               dominantBaseline="middle"
                             >
                               {m.note}
@@ -252,11 +252,11 @@ const Vector = () => {
             {/* Pop-up Cepat (Quick Action) - Sekarang di Luar SVG agar tidak terpotong & bisa diklik */}
             {activePopup && (
               <>
-                <div 
-                  className="popup-overlay" 
+                <div
+                  className="popup-overlay"
                   onClick={() => setActivePopup(null)}
                 />
-                <div 
+                <div
                   className="quick-popup"
                   style={{
                     position: 'absolute',
@@ -273,13 +273,13 @@ const Vector = () => {
                   <div className="popup-body">
                     {/* Pilih Status Langsung di Pop-up */}
                     <div className="popup-status-selector">
-                      <button 
+                      <button
                         className={`status-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
-                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' }}))}
+                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' } }))}
                       >✓ LULUS</button>
-                      <button 
+                      <button
                         className={`status-btn cross ${markers[activePopup.id]?.type === 'cross' ? 'active' : ''}`}
-                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' }}))}
+                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' } }))}
                       >✕ CACAT</button>
                     </div>
 
@@ -291,8 +291,8 @@ const Vector = () => {
                     {/* Quick Tags untuk Mempercepat Kerja User */}
                     <div className="quick-tags">
                       {["Lecet", "Penyok", "Pecah", "Kusam", "Hilang"].map(tag => (
-                        <button 
-                          key={tag} 
+                        <button
+                          key={tag}
                           className="tag-btn"
                           onClick={() => {
                             const currentNote = markers[activePopup.id]?.note || "";
@@ -305,16 +305,16 @@ const Vector = () => {
                       ))}
                     </div>
 
-                    <textarea 
+                    <textarea
                       className="popup-textarea"
                       placeholder="Tulis catatan tambahan di sini..."
                       value={markers[activePopup.id]?.note || ""}
                       onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
                       autoFocus
                     />
-                    
+
                     <div className="popup-footer">
-                      <button 
+                      <button
                         className="popup-delete-btn"
                         onClick={() => {
                           setMarkers(prev => {
@@ -325,7 +325,7 @@ const Vector = () => {
                           setActivePopup(null);
                         }}
                       >🗑 Hapus Tanda</button>
-                      <button 
+                      <button
                         className="popup-save-btn"
                         onClick={() => setActivePopup(null)}
                       >SIMPAN</button>
@@ -344,6 +344,29 @@ const Vector = () => {
         <span>BAGIAN: <strong>{hoverName || "PILIH BAGIAN MOBIL"}</strong></span>
       </div>
 
+      {/* Panel Catatan/Komplain */}
+      {Object.keys(markers).some(id => markers[id].type === 'cross') && (
+        <div className="notes-container">
+          <h3 className="notes-title">Catatan Komplain (Cacat)</h3>
+          <div className="notes-list">
+            {Object.keys(markers).map(id => {
+              const m = markers[id];
+              if (m.type !== 'cross') return null;
+              return (
+                <div key={id} className="note-item">
+                  <div className="note-label-group">
+                    <span className="note-label">{m.partName}</span>
+                    <span className="note-coords">X: {Math.round(m.x)}, Y: {Math.round(m.y)}</span>
+                  </div>
+                  <div className="note-text-display">
+                    {m.note || <span style={{ color: '#ccc', fontStyle: 'italic' }}>Tidak ada catatan...</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
