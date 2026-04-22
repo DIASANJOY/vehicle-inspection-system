@@ -255,6 +255,18 @@ const Vector = () => {
                     <button onClick={() => setActivePopup(null)}>✕</button>
                   </div>
                   <div className="popup-body">
+                    {/* Pilih Status Langsung di Pop-up */}
+                    <div className="popup-status-selector">
+                      <button 
+                        className={`status-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
+                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' }}))}
+                      >✓ LULUS</button>
+                      <button 
+                        className={`status-btn cross ${markers[activePopup.id]?.type === 'cross' ? 'active' : ''}`}
+                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' }}))}
+                      >✕ CACAT</button>
+                    </div>
+
                     <div className="part-info">
                       <span className="info-label">KOORDINAT:</span>
                       <span className="info-value">X: {Math.round(activePopup.x)}, Y: {Math.round(activePopup.y)}</span>

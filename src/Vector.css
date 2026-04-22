@@ -495,3 +495,24 @@
   color: white;
 }
 
+
+.popup-status-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.status-btn {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s;
+}
+
+.status-btn.tick.active { background: #28a745; color: white; border-color: transparent; }
+.status-btn.cross.active { background: #dc3545; color: white; border-color: transparent; }
+
