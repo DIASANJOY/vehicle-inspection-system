@@ -962,7 +962,9 @@
 .data-table-container {
   padding: 0;
   overflow-y: auto;
+  overflow-x: auto;
   flex: 1;
+  -webkit-overflow-scrolling: touch;
 }
 
 .inspection-table {
@@ -1205,7 +1207,8 @@
   .data-view-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 20px;
+    gap: 15px;
+    padding: 15px 20px;
   }
   
   .header-buttons {
@@ -1215,16 +1218,77 @@
   
   .tab-buttons {
     width: 100%;
+    order: 2;
   }
   
   .tab-btn {
     flex: 1;
+    padding: 10px;
   }
   
   .action-buttons {
     width: 100%;
     justify-content: space-between;
-    flex-wrap: wrap;
+    order: 1;
+  }
+
+  .data-view-content {
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .inspection-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .inspection-table th, .inspection-table td {
+    white-space: nowrap;
+    padding: 12px 15px;
+  }
+
+  .json-preview-section {
+    padding: 15px;
+  }
+
+  .json-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .copy-json-inline {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .overall-badge {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .action-buttons .export-btn {
+    padding: 10px 5px;
+    font-size: 11px;
+  }
+
+  .close-data-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
   }
 }
 
