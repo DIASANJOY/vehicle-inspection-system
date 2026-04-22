@@ -265,7 +265,7 @@ const Vector = () => {
                     position: 'absolute',
                     left: `${(activePopup.x / (view === 'front' ? 700.72 : 674.58)) * 100}%`,
                     top: `${(activePopup.y / (view === 'front' ? 568.24 : 595.24)) * 100}%`,
-                    transform: `translate(-50%, ${activePopup.y < 180 ? '20px' : '-110%'})`,
+                    transform: `translate(-50%, ${activePopup.y < 300 ? '25px' : '-105%'})`,
                     zIndex: 100
                   }}
                 >
