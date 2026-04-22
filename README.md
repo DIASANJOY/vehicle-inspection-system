@@ -25,11 +25,12 @@ A modern, interactive web application for vehicle inspection built with **React*
 ```text
 vehicle-inspection-system/
 ├── src/
+│   ├── assets/            # File gambar & SVG
+│   │   ├── suv-front.svg
+│   │   └── suv-back.svg
 │   ├── main.jsx           # Entry point aplikasi
 │   ├── Vector.jsx         # Komponen utama inspeksi
-│   ├── Vector.css         # Styling aplikasi
-│   ├── suv-front.svg      # Asset SVG depan
-│   └── suv-back.svg       # Asset SVG belakang
+│   └── Vector.css         # Styling aplikasi
 ├── index.html             # Template HTML utama
 ├── vite.config.js         # Konfigurasi Vite & SVGR
 ├── package.json           # Daftar library & script

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Vector.css';
-import FrontSVG from './suv-front.svg?react';
-import BackSVG from './suv-back.svg?react';
+import FrontSVG from './assets/suv-front.svg?react';
+import BackSVG from './assets/suv-back.svg?react';
 
 const Vector = () => {
   const [view, setView] = useState('front');
