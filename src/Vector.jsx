@@ -190,13 +190,13 @@ const Vector = () => {
                 );
               })}
 
-              {/* Pop-up Cepat (Quick Action) */}
+              {/* Pop-up Cepat (Quick Action) dengan Smart Positioning */}
               {activePopup && (
                 <foreignObject 
                   x={activePopup.x - 100} 
-                  y={activePopup.y - 160} 
+                  y={activePopup.y < 180 ? activePopup.y + 30 : activePopup.y - 170} 
                   width="200" 
-                  height="150"
+                  height="160"
                   style={{ overflow: 'visible' }}
                 >
                   <div className="quick-popup">
