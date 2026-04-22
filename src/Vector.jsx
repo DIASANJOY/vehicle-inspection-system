@@ -13,6 +13,8 @@ const Vector = () => {
   const pressTimer = React.useRef(null);
 
   const handleAction = (e) => {
+    if (activePopup) return; // Jangan buat tanda baru kalau pop-up lagi buka
+    
     const path = e.target.closest('[id]');
     const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
     
@@ -226,14 +228,29 @@ const Vector = () => {
                     <input 
                       type="text" 
                       className="popup-input"
-                      placeholder="Catatan..."
+                      placeholder="Tulis catatan kerusakan..."
                       value={markers[activePopup.id]?.note || ""}
                       onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
+                      autoFocus
                     />
+                    <button 
+                      className="popup-save-btn"
+                      onClick={() => setActivePopup(null)}
+                    >
+                      SIMPAN & KEMBALI
+                    </button>
                   </div>
                 </foreignObject>
               )}
             </svg>
+
+            {/* Overlay untuk menutup pop-up jika klik di luar */}
+            {activePopup && (
+              <div 
+                className="popup-overlay" 
+                onClick={() => setActivePopup(null)}
+              />
+            )}
           </div>
         </div>
 

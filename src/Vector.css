@@ -375,3 +375,36 @@
   border-color: #3182ce;
 }
 
+
+/* TAMBAHAN UNTUK FIX BUG POPUP */
+.popup-save-btn {
+  background: #3182ce;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 5px;
+}
+
+.popup-save-btn:hover {
+  background: #2b6cb0;
+}
+
+.popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 50; /* Di bawah popup tapi di atas mobil */
+}
+
+.quick-popup {
+  z-index: 100;
+}
+
