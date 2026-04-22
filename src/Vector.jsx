@@ -194,12 +194,14 @@ const Vector = () => {
                     }}
                     className="marker-group"
                   >
-                    <circle r="18" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="2" />
+                    <circle r="22" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="3" />
                     <text
                       className={`symbol ${m.type}`}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       dy=".1em"
+                      fontSize="18px"
+                      fontWeight="bold"
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
@@ -217,26 +219,26 @@ const Vector = () => {
                         style={{ cursor: 'pointer' }}
                       >
                         {!m.showNote ? (
-                          // Tampilan Ikon Amplop saat disembunyikan
+                          // Tampilan Ikon Amplop saat disembunyikan (UKURAN JUMBO)
                           <g>
-                            <circle r="14" fill="#3182ce" stroke="white" strokeWidth="1" />
-                            <text fill="white" fontSize="14" textAnchor="middle" dominantBaseline="middle">✉️</text>
+                            <circle r="20" fill="#3182ce" stroke="white" strokeWidth="2" />
+                            <text fill="white" fontSize="20" textAnchor="middle" dominantBaseline="middle">✉️</text>
                           </g>
                         ) : (
                           // Tampilan Teks Lengkap saat diklik
                           <g>
                             <rect
-                              x={-(m.note.length * 4.5 + 15)}
-                              y="-15"
-                              width={m.note.length * 9 + 30}
-                              height="30"
-                              rx="8"
+                              x={-(m.note.length * 6 + 20)}
+                              y="-20"
+                              width={m.note.length * 12 + 40}
+                              height="40"
+                              rx="10"
                               fill="rgba(0,0,0,0.95)"
                             />
                             <text
                               fill="white"
-                              fontSize="14"
-                              fontWeight="600"
+                              fontSize="18"
+                              fontWeight="bold"
                               textAnchor="middle"
                               dominantBaseline="middle"
                             >
