@@ -344,29 +344,6 @@ const Vector = () => {
         <span>BAGIAN: <strong>{hoverName || "PILIH BAGIAN MOBIL"}</strong></span>
       </div>
 
-      {/* Panel Catatan/Komplain */}
-      {Object.keys(markers).some(id => markers[id].type === 'cross') && (
-        <div className="notes-container">
-          <h3 className="notes-title">Catatan Komplain (Cacat)</h3>
-          <div className="notes-list">
-            {Object.keys(markers).map(id => {
-              const m = markers[id];
-              if (m.type !== 'cross') return null;
-              return (
-                  <div key={id} className="note-item">
-                    <div className="note-label-group">
-                      <span className="note-label">{m.partName}</span>
-                      <span className="note-coords">X: {Math.round(m.x)}, Y: {Math.round(m.y)}</span>
-                    </div>
-                    <div className="note-text-display">
-                      {m.note || <span style={{ color: '#ccc', fontStyle: 'italic' }}>Tidak ada catatan...</span>}
-                    </div>
-                  </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
