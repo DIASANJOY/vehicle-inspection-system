@@ -554,3 +554,96 @@
   border: 1px solid #edf2f7;
 }
 
+
+/* FOOTER PANEL: GENERAL NOTES & SUMMARY */
+.footer-panel {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 -5px 25px rgba(0,0,0,0.05);
+}
+
+@media (min-width: 992px) {
+  .footer-panel {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+.general-notes-section h3 {
+  font-size: 16px;
+  color: #2d3748;
+  margin-bottom: 15px;
+}
+
+.general-textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 2px solid #edf2f7;
+  border-radius: 12px;
+  padding: 15px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  transition: all 0.2s;
+}
+
+.general-textarea:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  background: #f7fafc;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.stats-group {
+  display: flex;
+  gap: 15px;
+}
+
+.stat-card {
+  flex: 1;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-card.passed { background: #f0fff4; color: #2f855a; border: 1px solid #c6f6d5; }
+.stat-card.failed { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+
+.stat-label { font-size: 11px; font-weight: bold; margin-bottom: 5px; }
+.stat-count { font-size: 24px; font-weight: 800; }
+
+.submit-report-btn {
+  width: 100%;
+  background: #3182ce;
+  color: white;
+  border: none;
+  padding: 18px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 10px 20px rgba(49, 130, 206, 0.2);
+}
+
+.submit-report-btn:hover {
+  background: #2b6cb0;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(49, 130, 206, 0.3);
+}
+

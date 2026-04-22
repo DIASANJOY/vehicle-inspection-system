@@ -8,6 +8,7 @@ const Vector = () => {
   const [markers, setMarkers] = useState({});
   const [hoverName, setHoverName] = useState("");
   const [activePopup, setActivePopup] = useState(null); // { id, x, y }
+  const [generalNote, setGeneralNote] = useState(""); // Catatan Umum
 
   // Timer untuk deteksi Long Press
   const pressTimer = React.useRef(null);
@@ -347,6 +348,36 @@ const Vector = () => {
       <div className="info-bar">
         <span>BAGIAN: <strong>{hoverName || "PILIH BAGIAN MOBIL"}</strong></span>
         <span className="legend">Klik: Ganti ✓/✕ | Tahan (Hold): Catatan & Hapus</span>
+      </div>
+
+      {/* Footer Panel: Catatan Umum & Ringkasan */}
+      <div className="footer-panel">
+        <div className="general-notes-section">
+          <h3>📝 Catatan Umum / Rekomendasi</h3>
+          <textarea 
+            placeholder="Tulis evaluasi keseluruhan kendaraan di sini..."
+            className="general-textarea"
+            value={generalNote}
+            onChange={(e) => setGeneralNote(e.target.value)}
+          />
+        </div>
+
+        <div className="summary-section">
+          <div className="stats-group">
+            <div className="stat-card passed">
+              <span className="stat-label">LULUS</span>
+              <span className="stat-count">{Object.values(markers).filter(m => m.type === 'tick').length}</span>
+            </div>
+            <div className="stat-card failed">
+              <span className="stat-label">CACAT</span>
+              <span className="stat-count">{Object.values(markers).filter(m => m.type === 'cross').length}</span>
+            </div>
+          </div>
+          
+          <button className="submit-report-btn" onClick={() => alert("Laporan Berhasil Disimpan!")}>
+            SIMPAN & SELESAIKAN INSPEKSI
+          </button>
+        </div>
       </div>
     </div>
   );
