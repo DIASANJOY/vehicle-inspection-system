@@ -20,8 +20,10 @@ const Vector = () => {
     }
 
     const path = e.target.closest('[id]');
-    if (Object.keys(markers).length >= 4) {
-      alert("Maksimal 4 tanda diperbolehkan agar laporan tetap ringkas.");
+    const markersOnPart = Object.values(markers).filter(m => m.pathId === path?.id && m.view === view).length;
+    
+    if (markersOnPart >= 4) {
+      alert(`Maksimal 4 tanda pada bagian ${path.id.toUpperCase()} diperbolehkan.`);
       return;
     }
 
@@ -59,8 +61,9 @@ const Vector = () => {
       const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
       setMarkers(prev => {
-        if (Object.keys(prev).length >= 4) {
-          alert("Maksimal 4 tanda diperbolehkan.");
+        const markersOnPart = Object.values(prev).filter(m => m.pathId === path?.id && m.view === view).length;
+        if (markersOnPart >= 4) {
+          alert(`Maksimal 4 tanda pada bagian ${path.id.toUpperCase()} diperbolehkan.`);
           return prev;
         }
 
