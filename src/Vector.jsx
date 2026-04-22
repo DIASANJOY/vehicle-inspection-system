@@ -350,34 +350,18 @@ const Vector = () => {
         <span className="legend">Klik: Ganti ✓/✕ | Tahan (Hold): Catatan & Hapus</span>
       </div>
 
-      {/* Footer Panel: Catatan Umum & Ringkasan */}
-      <div className="footer-panel">
-        <div className="general-notes-section">
-          <h3>📝 Catatan Umum / Rekomendasi</h3>
-          <textarea 
-            placeholder="Tulis evaluasi keseluruhan kendaraan di sini..."
-            className="general-textarea"
-            value={generalNote}
-            onChange={(e) => setGeneralNote(e.target.value)}
-          />
+      {/* Footer Berdasarkan Sketsa User: Dua Baris Horizontal */}
+      <div className="wireframe-footer">
+        {/* Baris 1: Ringkasan Stats */}
+        <div className="footer-bar stats-bar">
+          <div className="stat-item"><span className="dot tick"></span> <strong>{Object.values(markers).filter(m => m.type === 'tick').length}</strong> LULUS</div>
+          <div className="stat-item"><span className="dot cross"></span> <strong>{Object.values(markers).filter(m => m.type === 'cross').length}</strong> CACAT</div>
         </div>
 
-        <div className="summary-section">
-          <div className="stats-group">
-            <div className="stat-card passed">
-              <span className="stat-label">LULUS</span>
-              <span className="stat-count">{Object.values(markers).filter(m => m.type === 'tick').length}</span>
-            </div>
-            <div className="stat-card failed">
-              <span className="stat-label">CACAT</span>
-              <span className="stat-count">{Object.values(markers).filter(m => m.type === 'cross').length}</span>
-            </div>
-          </div>
-          
-          <button className="submit-report-btn" onClick={() => alert("Laporan Berhasil Disimpan!")}>
-            SIMPAN & SELESAIKAN INSPEKSI
-          </button>
-        </div>
+        {/* Baris 2: Tombol Aksi */}
+        <button className="footer-bar submit-bar" onClick={() => alert("Laporan Terkirim!")}>
+          KIRIM LAPORAN INSPEKSI
+        </button>
       </div>
     </div>
   );

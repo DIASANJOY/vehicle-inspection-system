@@ -301,15 +301,16 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  padding: 12px;
+  padding: 15px; /* Tambah padding agar lebih lega */
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   border: 1px solid #edf2f7;
   animation: zoomIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: auto;
-  width: 260px; /* Lebar standar untuk mobile & desktop */
-  max-width: 85vw; /* Agar tidak meluap di layar HP sempit */
+  width: 280px; 
+  max-width: 85vw;
+  box-sizing: border-box; /* WAJIB */
 }
 
 /* Mencegah menu bawaan HP saat Hold */
@@ -478,13 +479,15 @@
 
 .popup-textarea {
   width: 100%;
-  min-height: 60px;
+  box-sizing: border-box; /* Kunci agar tidak meluber */
+  min-height: 80px;
   border: 1px solid #e2e8f0;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
   font-family: inherit;
   resize: none;
+  background: #f8fafc;
 }
 
 .popup-footer {
@@ -512,6 +515,8 @@
 .popup-status-selector {
   display: flex;
   gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .status-btn {
@@ -645,5 +650,106 @@
   background: #2b6cb0;
   transform: translateY(-2px);
   box-shadow: 0 12px 25px rgba(49, 130, 206, 0.3);
+}
+
+
+/* WIREFRAME FOOTER (2 BARS) - REFINED */
+.wireframe-footer {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.footer-bar {
+  width: 100%;
+  min-height: 55px; /* Lebih lega */
+  background: #f8fafc;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.stats-bar {
+  gap: 40px; /* Jarak antar stat lebih jauh */
+  color: #475569;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.submit-bar {
+  background: #3182ce;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2);
+}
+
+.submit-bar:hover {
+  background: #2b6cb0;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(49, 130, 206, 0.3);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Jarak dot ke teks lebih jauh */
+}
+
+.stat-item strong {
+  font-size: 16px;
+  color: #1a202c;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+.dot.tick { background: #48bb78; }
+.dot.cross { background: #f56565; }
+
+
+/* PERBAIKAN SPASI FOOTER (ANTI-TABRAKAN) */
+.wireframe-footer {
+  margin-top: 35px; /* Jarak dari atas lebih lega */
+  padding: 0 10px 20px 10px;
+  gap: 15px; /* Jarak antar baris diperlebar */
+}
+
+.footer-bar {
+  padding: 0 20px;
+  height: 55px; /* Sedikit lebih tinggi agar tidak sesak */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.stats-bar {
+  justify-content: space-around; /* Menyebar elemen ke kiri dan kanan */
+  background: #ffffff;
+  border: 1.5px solid #edf2f7;
+}
+
+.submit-bar {
+  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+  font-size: 14px;
+  letter-spacing: 1.5px;
+}
+
+.stat-item {
+  font-size: 13px;
+  letter-spacing: 0.5px;
 }
 
