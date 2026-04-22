@@ -529,3 +529,28 @@
 .status-btn.tick.active { background: #28a745; color: white; border-color: transparent; }
 .status-btn.cross.active { background: #dc3545; color: white; border-color: transparent; }
 
+
+.info-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;
+}
+
+@media (min-width: 768px) {
+  .info-bar {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.legend {
+  font-size: 11px;
+  color: #a0aec0;
+  background: #f7fafc;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #edf2f7;
+}
+

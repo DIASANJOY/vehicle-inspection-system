@@ -11,9 +11,13 @@ const Vector = () => {
 
   // Timer untuk deteksi Long Press
   const pressTimer = React.useRef(null);
+  const isLongPress = React.useRef(false); // Flag untuk mencegah klik setelah hold
 
   const handleAction = (e) => {
-    if (activePopup) return;
+    if (activePopup || isLongPress.current) {
+      isLongPress.current = false; // Reset flag
+      return; 
+    }
 
     const path = e.target.closest('[id]');
     const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
@@ -68,6 +72,7 @@ const Vector = () => {
       setMarkers(prev => {
         if (prev[key]) {
           setActivePopup({ id: key, x: prev[key].x, y: prev[key].y, partName: prev[key].partName });
+          isLongPress.current = true;
           return prev;
         }
         const newMarker = {
@@ -75,6 +80,7 @@ const Vector = () => {
           note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase()
         };
         setActivePopup({ id: key, x: transformedPoint.x, y: transformedPoint.y, partName: newMarker.partName });
+        isLongPress.current = true;
         return { ...prev, [key]: newMarker };
       });
     }, 600);
@@ -203,10 +209,10 @@ const Vector = () => {
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
-                    {/* Ikon/Balon Catatan (Toggle Show/Hide) */}
+                    {/* Ikon/Balon Catatan (Toggle Show/Hide) dengan Smart Positioning */}
                     {m.note && (
-                      <g
-                        transform="translate(0, -40)"
+                      <g 
+                        transform={`translate(0, ${m.y < 50 ? 40 : -40})`} 
                         onClick={(e) => {
                           e.stopPropagation();
                           setMarkers(prev => ({
