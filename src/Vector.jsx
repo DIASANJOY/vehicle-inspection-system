@@ -308,13 +308,16 @@ const Vector = () => {
                       ))}
                     </div>
 
-                    <textarea
-                      className="popup-textarea"
-                      placeholder="Tulis catatan tambahan di sini..."
-                      value={markers[activePopup.id]?.note || ""}
-                      onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
-                      autoFocus
-                    />
+                    <div className="notes-input-group">
+                      <label className="notes-label">📩 ISI CATATAN / KOMPLAIN:</label>
+                      <textarea
+                        className="popup-textarea"
+                        placeholder="Tulis catatan tambahan di sini..."
+                        value={markers[activePopup.id]?.note || ""}
+                        onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
+                        autoFocus
+                      />
+                    </div>
 
                     <div className="popup-footer">
                       <button
@@ -358,7 +361,7 @@ const Vector = () => {
 
         {/* Baris 2: Tombol Aksi */}
         <button className="footer-bar submit-bar" onClick={() => alert("Laporan Terkirim!")}>
-          KIRIM LAPORAN INSPEKSI
+          📩 KIRIM LAPORAN INSPEKSI
         </button>
       </div>
     </div>

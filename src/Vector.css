@@ -811,3 +811,49 @@
   box-shadow: 0 0 8px rgba(245, 101, 101, 0.4);
 }
 
+
+/* PERBESAR IKON & TEKS FOOTER/POPUP */
+.submit-bar {
+  font-size: 16px !important; /* Lebih besar */
+  height: 65px !important; /* Lebih tinggi */
+  gap: 10px;
+}
+
+.stat-item {
+  font-size: 15px !important; /* Lebih jelas */
+}
+
+.popup-textarea {
+  font-size: 15px !important; /* Isi surat lebih besar */
+  min-height: 100px !important;
+}
+
+.dot {
+  width: 15px !important; /* Ikon titik lebih besar */
+  height: 15px !important;
+}
+
+
+/* POPUP NOTES INPUT GROUP */
+.notes-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.notes-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.5px;
+}
+
+.popup-textarea {
+  border: 2px solid #cbd5e0 !important; /* Garis tepi lebih tegas */
+  border-radius: 10px !important;
+}
+
