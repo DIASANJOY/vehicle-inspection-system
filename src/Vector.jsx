@@ -14,35 +14,41 @@ const Vector = () => {
     
     if (!path || excludedIds.includes(path.id)) return;
 
-    const key = `${view}-${path.id}`;
+    const svg = path.ownerSVGElement;
+    const point = svg.createSVGPoint();
+    point.x = e.clientX;
+    point.y = e.clientY;
+    const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-    setMarkers(prev => {
-      const currentMarker = prev[key];
-      const newMarkers = { ...prev };
-
-      if (!currentMarker) {
-        // Klik 1: Buat baru (Tick)
-        const svg = path.ownerSVGElement;
-        const point = svg.createSVGPoint();
-        point.x = e.clientX;
-        point.y = e.clientY;
-        const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-
-        newMarkers[key] = { 
-          type: 'tick', 
-          x: transformedPoint.x, 
-          y: transformedPoint.y, 
-          note: "", 
-          partName: path.id.replace(/-/g, ' ').toUpperCase() 
-        };
-      } else if (currentMarker.type === 'tick') {
-        // Klik 2: Ubah ke Cross
-        newMarkers[key] = { ...currentMarker, type: 'cross' };
-      } else {
-        // Klik 3: Hapus
-        delete newMarkers[key];
+    // BUAT TANDA BARU (Setiap klik buat tanda baru dengan ID unik)
+    const newId = Date.now();
+    setMarkers(prev => ({
+      ...prev,
+      [newId]: { 
+        id: newId,
+        view: view, // Simpan view agar tanda tidak muncul di sisi lain
+        type: 'tick', 
+        x: transformedPoint.x, 
+        y: transformedPoint.y, 
+        note: "", 
+        partName: path.id.replace(/-/g, ' ').toUpperCase() 
       }
+    }));
+  };
 
+  const cycleMarker = (e, markerId) => {
+    e.stopPropagation(); // Mencegah klik tembus ke mobil (biar tidak buat tanda baru)
+    
+    setMarkers(prev => {
+      const m = prev[markerId];
+      if (!m) return prev;
+
+      const newMarkers = { ...prev };
+      if (m.type === 'tick') {
+        newMarkers[markerId] = { ...m, type: 'cross' };
+      } else {
+        delete newMarkers[markerId];
+      }
       return newMarkers;
     });
   };
@@ -89,10 +95,15 @@ const Vector = () => {
             {/* Overlay Penanda (SVG transparan dengan viewBox yang sama) */}
             <svg viewBox={viewBox} className="marker-overlay">
               {Object.keys(markers).map(id => {
-                if (!id.startsWith(view)) return null;
                 const m = markers[id];
+                if (m.view !== view) return null;
                 return (
-                  <g key={id} transform={`translate(${m.x}, ${m.y})`}>
+                  <g 
+                    key={id} 
+                    transform={`translate(${m.x}, ${m.y})`}
+                    onClick={(e) => cycleMarker(e, id)}
+                    className="marker-group"
+                  >
                     <circle r="18" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="2" />
                     <text 
                       className={`symbol ${m.type}`}

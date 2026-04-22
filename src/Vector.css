@@ -117,7 +117,6 @@
   filter: brightness(0.95);
 }
 
-
 /* Marker Styling */
 .symbol {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -128,6 +127,11 @@
 }
 .symbol.tick { fill: #28a745; }
 .symbol.cross { fill: #dc3545; }
+
+.marker-group {
+  pointer-events: auto;
+  cursor: pointer;
+}
 
 .info-bar {
   margin-top: 30px;
@@ -219,7 +223,6 @@
   transition: border-color 0.2s;
 }
 
-
 .note-input:focus {
   border-color: #dc3545;
   background: white;
@@ -229,7 +232,7 @@
 @media (max-width: 768px) {
   .app-wrapper {
     padding: 20px 15px;
-    justify-content: flex-start; /* Agar bisa scroll jika konten panjang */
+    justify-content: flex-start;
     min-height: 100vh;
   }
 
@@ -251,7 +254,7 @@
 
   .car-card {
     grid-area: card;
-    padding: 40px 15px; /* Padding disesuaikan */
+    padding: 40px 15px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -259,7 +262,7 @@
 
   .badge {
     left: 50%;
-    transform: translateX(-50%); /* Badge jadi di tengah di mobile */
+    transform: translateX(-50%);
     top: 15px;
   }
 
