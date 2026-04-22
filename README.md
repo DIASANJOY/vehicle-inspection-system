@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-Cara Menjalankan: jika belum menginstall npm maka install dulu
-npm install
-lalu jalankan :
-npm run dev 
-untuk menjalankan server dan agar halaman browser akan terload sendirinya seiring perubahan code
-=======
 # Vehicle Inspection System
 
 A modern, interactive web application for vehicle inspection built with **React** and **Vite**. This tool allows users to perform visual inspections on vehicle panels (Front and Rear) using interactive SVG maps.
@@ -27,13 +20,29 @@ A modern, interactive web application for vehicle inspection built with **React*
 - [vite-plugin-svgr](https://github.com/pd4d10/vite-plugin-svgr) - Untuk mengolah file SVG sebagai komponen React.
 - **Vanilla CSS** - Untuk styling kustom yang ringan dan fleksibel.
 
+## 📁 Struktur Folder (Vite Standard)
+
+```text
+vehicle-inspection-system/
+├── src/
+│   ├── main.jsx           # Entry point aplikasi
+│   ├── Vector.jsx         # Komponen utama inspeksi
+│   ├── Vector.css         # Styling aplikasi
+│   ├── suv-front.svg      # Asset SVG depan
+│   └── suv-back.svg       # Asset SVG belakang
+├── index.html             # Template HTML utama
+├── vite.config.js         # Konfigurasi Vite & SVGR
+├── package.json           # Daftar library & script
+└── README.md              # Dokumentasi proyek
+```
+
 ## 📋 Prasyarat
 
 Sebelum menjalankan proyek ini, pastikan Anda sudah menginstall:
 - [Node.js](https://nodejs.org/) (Versi LTS direkomendasikan)
 - NPM (Sudah termasuk saat install Node.js)
 
-## ⚙️ Cara Menjalankan (Dokumentasi Vite)
+## ⚙️ Cara Menjalankan
 
 Ikuti langkah-langkah berikut untuk menjalankan proyek di komputer lokal Anda:
 
@@ -44,20 +53,16 @@ cd vehicle-inspection-system
 ```
 
 ### 2. Install Dependensi
-Perintah ini akan mendownload semua library yang dibutuhkan (termasuk Vite dan React) ke dalam folder `node_modules`:
 ```bash
 npm install
 ```
 
-### 3. Jalankan Mode Pengembangan (Development)
-Jalankan perintah berikut untuk membuka aplikasi di browser:
+### 3. Jalankan Mode Pengembangan
 ```bash
 npm run dev
 ```
-Setelah perintah dijalankan, buka alamat yang muncul di terminal (biasanya `http://localhost:5173`).
 
 ### 4. Build untuk Produksi
-Jika ingin membuat file siap pakai untuk hosting:
 ```bash
 npm run build
 ```
@@ -65,4 +70,3 @@ npm run build
 ---
 
 Dibuat untuk keperluan PKL / Project Vehicle Inspection.
->>>>>>> d162980 (Update: Cycle markers logic, complaint notes system, and professional README.md)
