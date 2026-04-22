@@ -198,10 +198,10 @@ const Vector = () => {
                         style={{ cursor: 'pointer' }}
                       >
                         {!m.showNote ? (
-                          // Tampilan Ikon Kecil saat disembunyikan
+                          // Tampilan Ikon Amplop saat disembunyikan
                           <g>
                             <circle r="10" fill="#3182ce" />
-                            <text fill="white" fontSize="8" textAnchor="middle" dominantBaseline="middle">💬</text>
+                            <text fill="white" fontSize="8" textAnchor="middle" dominantBaseline="middle">✉️</text>
                           </g>
                         ) : (
                           // Tampilan Teks Lengkap saat diklik
@@ -254,33 +254,55 @@ const Vector = () => {
                     <span>{activePopup.partName}</span>
                     <button onClick={() => setActivePopup(null)}>✕</button>
                   </div>
-                  <div className="popup-actions">
-                    <button 
-                      className={`action-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
-                      onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' }}))}
-                    >✓</button>
-                    <button 
-                      className={`action-btn cross ${markers[activePopup.id]?.type === 'cross' ? 'active' : ''}`}
-                      onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' }}))}
-                    >✕</button>
-                    <button 
-                      className="action-btn delete"
-                      onClick={() => {
-                        setMarkers(prev => {
-                          const n = { ...prev };
-                          delete n[activePopup.id];
-                          return n;
-                        });
-                        setActivePopup(null);
-                      }}
-                    >🗑</button>
+                  <div className="popup-body">
+                    <div className="part-info">
+                      <span className="info-label">KOORDINAT:</span>
+                      <span className="info-value">X: {Math.round(activePopup.x)}, Y: {Math.round(activePopup.y)}</span>
+                    </div>
+
+                    {/* Quick Tags untuk Mempercepat Kerja User */}
+                    <div className="quick-tags">
+                      {["Lecet", "Penyok", "Pecah", "Kusam", "Hilang"].map(tag => (
+                        <button 
+                          key={tag} 
+                          className="tag-btn"
+                          onClick={() => {
+                            const currentNote = markers[activePopup.id]?.note || "";
+                            const newNote = currentNote ? `${currentNote}, ${tag}` : tag;
+                            handleNoteChange(activePopup.id, newNote);
+                          }}
+                        >
+                          +{tag}
+                        </button>
+                      ))}
+                    </div>
+
+                    <textarea 
+                      className="popup-textarea"
+                      placeholder="Tulis catatan tambahan di sini..."
+                      value={markers[activePopup.id]?.note || ""}
+                      onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
+                      autoFocus
+                    />
+                    
+                    <div className="popup-footer">
+                      <button 
+                        className="popup-delete-btn"
+                        onClick={() => {
+                          setMarkers(prev => {
+                            const n = { ...prev };
+                            delete n[activePopup.id];
+                            return n;
+                          });
+                          setActivePopup(null);
+                        }}
+                      >🗑 Hapus Tanda</button>
+                      <button 
+                        className="popup-save-btn"
+                        onClick={() => setActivePopup(null)}
+                      >SIMPAN</button>
+                    </div>
                   </div>
-                  <button 
-                    className="popup-save-btn"
-                    onClick={() => setActivePopup(null)}
-                  >
-                    TUTUP
-                  </button>
                 </div>
               </>
             )}
@@ -303,19 +325,15 @@ const Vector = () => {
               const m = markers[id];
               if (m.type !== 'cross') return null;
               return (
-                <div key={id} className="note-item">
-                  <div className="note-label-group">
-                    <span className="note-label">{m.partName}</span>
-                    <span className="note-coords">X: {Math.round(m.x)}, Y: {Math.round(m.y)}</span>
+                  <div key={id} className="note-item">
+                    <div className="note-label-group">
+                      <span className="note-label">{m.partName}</span>
+                      <span className="note-coords">X: {Math.round(m.x)}, Y: {Math.round(m.y)}</span>
+                    </div>
+                    <div className="note-text-display">
+                      {m.note || <span style={{ color: '#ccc', fontStyle: 'italic' }}>Tidak ada catatan...</span>}
+                    </div>
                   </div>
-                  <input 
-                    type="text" 
-                    placeholder="Masukkan komplain/catatan di sini..."
-                    value={m.note}
-                    onChange={(e) => handleNoteChange(id, e.target.value)}
-                    className="note-input"
-                  />
-                </div>
               );
             })}
           </div>

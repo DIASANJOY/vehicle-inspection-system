@@ -408,3 +408,90 @@
   z-index: 100;
 }
 
+
+.note-text-display {
+  flex: 1;
+  font-size: 14px;
+  color: #2d3748;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #edf2f7;
+}
+
+
+/* POPUP UPGRADE: QUICK TAGS & INFO */
+.popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.part-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #718096;
+  background: #f7fafc;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.info-label { font-weight: bold; }
+
+.quick-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-btn {
+  background: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-btn:hover {
+  background: #3182ce;
+  color: white;
+}
+
+.popup-textarea {
+  width: 100%;
+  min-height: 60px;
+  border: 1px solid #e2e8f0;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  resize: none;
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.popup-delete-btn {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid #feb2b2;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.popup-delete-btn:hover {
+  background: #c53030;
+  color: white;
+}
+
