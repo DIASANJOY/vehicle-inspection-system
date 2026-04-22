@@ -156,7 +156,7 @@ const Vector = () => {
       </style>
 
       <h2 className="title">Vehicle Inspection System</h2>
-      <p className="subtitle">Klik: Ganti ✓/✕ | Tahan (Hold): Catatan & Hapus</p>
+      <p className="subtitle">Klik: Ganti ✓/✕ | KLIK KANAN / Tahan (Hold): Catatan & Hapus</p>
 
       <div className="main-stage">
         <button className="btn-nav" onClick={() => setView(v => v === 'front' ? 'back' : 'front')}>❮</button>
