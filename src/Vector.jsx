@@ -23,33 +23,21 @@ const Vector = () => {
     const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
     if (!path || excludedIds.includes(path.id)) return;
 
-    const key = `${view}-${path.id}`;
+    // Selalu buat tanda baru jika klik di area kosong mobil
+    const svg = path.ownerSVGElement;
+    const point = svg.createSVGPoint();
+    point.x = e.clientX;
+    point.y = e.clientY;
+    const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-    setMarkers(prev => {
-      const currentMarker = prev[key];
-      const newMarkers = { ...prev };
-
-      if (!currentMarker) {
-        // Klik 1: Buat baru (Tick) di posisi klik
-        const svg = path.ownerSVGElement;
-        const point = svg.createSVGPoint();
-        point.x = e.clientX;
-        point.y = e.clientY;
-        const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-
-        newMarkers[key] = {
-          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y,
-          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase()
-        };
-      } else {
-        // Klik 2, 3, dst: Toggle antara Tick <-> Cross (Data Aman)
-        newMarkers[key] = { 
-          ...currentMarker, 
-          type: currentMarker.type === 'tick' ? 'cross' : 'tick' 
-        };
+    const newId = Date.now();
+    setMarkers(prev => ({
+      ...prev,
+      [newId]: { 
+        id: newId, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
+        note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
       }
-      return newMarkers;
-    });
+    }));
   };
 
   const handlePointerDown = (e) => {
@@ -62,7 +50,6 @@ const Vector = () => {
       const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
       if (!path || excludedIds.includes(path.id)) return;
 
-      const key = `${view}-${path.id}`;
       const svg = path.ownerSVGElement;
       const point = svg.createSVGPoint();
       point.x = x;
@@ -70,18 +57,16 @@ const Vector = () => {
       const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
       setMarkers(prev => {
-        if (prev[key]) {
-          setActivePopup({ id: key, x: prev[key].x, y: prev[key].y, partName: prev[key].partName });
-          isLongPress.current = true;
-          return prev;
-        }
-        const newMarker = {
-          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y,
-          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase()
-        };
-        setActivePopup({ id: key, x: transformedPoint.x, y: transformedPoint.y, partName: newMarker.partName });
+        const newId = Date.now();
+        const partName = path.id.replace(/-/g, ' ').toUpperCase();
+        
+        setActivePopup({ id: newId, x: transformedPoint.x, y: transformedPoint.y, partName });
         isLongPress.current = true;
-        return { ...prev, [key]: newMarker };
+        
+        return { 
+          ...prev, 
+          [newId]: { id: newId, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, note: "", pathId: path.id, partName } 
+        };
       });
     }, 600);
   };
