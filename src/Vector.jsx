@@ -94,7 +94,8 @@ const Vector = () => {
                     <text 
                       className={`symbol ${m.type}`}
                       textAnchor="middle" 
-                      dominantBaseline="central"
+                      dominantBaseline="middle"
+                      dy=".1em" 
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>

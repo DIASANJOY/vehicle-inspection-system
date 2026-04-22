@@ -117,12 +117,14 @@
   filter: brightness(0.95);
 }
 
+
 /* Marker Styling */
 .symbol {
-  font-family: Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 900;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 22px;
+  font-weight: bold;
   pointer-events: none;
+  user-select: none;
 }
 .symbol.tick { fill: #28a745; }
 .symbol.cross { fill: #dc3545; }
