@@ -77,21 +77,12 @@ const Vector = () => {
     if (pressTimer.current) clearTimeout(pressTimer.current);
   };
 
-  const cycleMarker = (e, markerId) => {
-    e.stopPropagation(); // Mencegah klik tembus ke mobil (biar tidak buat tanda baru)
-    
-    setMarkers(prev => {
-      const m = prev[markerId];
-      if (!m) return prev;
-
-      const newMarkers = { ...prev };
-      if (m.type === 'tick') {
-        newMarkers[markerId] = { ...m, type: 'cross' };
-      } else {
-        delete newMarkers[markerId];
-      }
-      return newMarkers;
-    });
+  const openPopup = (e, markerId) => {
+    e.stopPropagation(); 
+    const m = markers[markerId];
+    if (m) {
+      setActivePopup({ id: markerId, x: m.x, y: m.y, partName: m.partName });
+    }
   };
 
   const handleNoteChange = (id, note) => {
@@ -170,10 +161,10 @@ const Vector = () => {
                   <g 
                     key={id} 
                     transform={`translate(${m.x}, ${m.y})`}
-                    onClick={(e) => cycleMarker(e, id)}
+                    onClick={(e) => openPopup(e, id)}
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      setActivePopup({ id, x: m.x, y: m.y, partName: m.partName });
+                      openPopup(e, id);
                     }}
                     className="marker-group"
                   >
