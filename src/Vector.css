@@ -719,8 +719,44 @@
   box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
 }
 
-.dot.tick { background: #48bb78; }
-.dot.cross { background: #f56565; }
+/* MEDIA QUERIES UNTUK MOBILE */
+@media (max-width: 480px) {
+  .stats-bar {
+    gap: 15px; /* Jarak lebih kecil untuk HP sempit */
+    padding: 10px;
+    font-size: 12px;
+  }
+  
+  .stat-item strong {
+    font-size: 14px;
+  }
+
+  .submit-bar {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  .quick-popup {
+    width: 90vw; /* Lebih lebar di HP */
+    padding: 12px;
+  }
+
+  .tag-btn {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  .popup-textarea {
+    font-size: 12px;
+  }
+
+  .info-bar {
+    font-size: 11px;
+    padding: 8px;
+    border-bottom: 1px solid #edf2f7;
+    margin-bottom: 5px;
+  }
+}
 
 
 /* PERBAIKAN SPASI FOOTER (ANTI-TABRAKAN) */
