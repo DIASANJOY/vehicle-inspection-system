@@ -31,6 +31,7 @@ const Vector = () => {
         x: transformedPoint.x, 
         y: transformedPoint.y, 
         note: "", 
+        pathId: path.id, // Simpan ID asli untuk highlighting
         partName: path.id.replace(/-/g, ' ').toUpperCase() 
       }
     }));
@@ -73,8 +74,21 @@ const Vector = () => {
   const CurrentSVG = view === 'front' ? FrontSVG : BackSVG;
   const viewBox = view === 'front' ? "0 0 700.72 568.24" : "0 0 674.58 595.24";
 
+  // Ambil daftar ID unik yang sudah diberi tanda
+  const inspectedIds = [...new Set(Object.values(markers).map(m => m.pathId))];
+
   return (
     <div className="app-wrapper">
+      {/* Style Dinamis untuk Highlighting Bagian yang Terinspeksi */}
+      <style>
+        {inspectedIds.map(id => `
+          #${id} { 
+            stroke-width: 4px !important; 
+            filter: brightness(0.9);
+          }
+        `).join('')}
+      </style>
+
       <h2 className="title">Vehicle Inspection System</h2>
       <p className="subtitle">Klik 1x: ✓ LULUS | Klik 2x: ✕ CACAT | Klik 3x: HAPUS</p>
 
