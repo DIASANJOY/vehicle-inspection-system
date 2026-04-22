@@ -219,23 +219,23 @@ const Vector = () => {
                         {!m.showNote ? (
                           // Tampilan Ikon Amplop saat disembunyikan
                           <g>
-                            <circle r="10" fill="#3182ce" />
-                            <text fill="white" fontSize="8" textAnchor="middle" dominantBaseline="middle">✉️</text>
+                            <circle r="14" fill="#3182ce" stroke="white" strokeWidth="1" />
+                            <text fill="white" fontSize="14" textAnchor="middle" dominantBaseline="middle">✉️</text>
                           </g>
                         ) : (
                           // Tampilan Teks Lengkap saat diklik
                           <g>
                             <rect
-                              x={-(m.note.length * 3.5 + 10)}
-                              y="-12"
-                              width={m.note.length * 7 + 20}
-                              height="22"
-                              rx="6"
-                              fill="rgba(0,0,0,0.9)"
+                              x={-(m.note.length * 4.5 + 15)}
+                              y="-15"
+                              width={m.note.length * 9 + 30}
+                              height="30"
+                              rx="8"
+                              fill="rgba(0,0,0,0.95)"
                             />
                             <text
                               fill="white"
-                              fontSize="10"
+                              fontSize="14"
                               fontWeight="600"
                               textAnchor="middle"
                               dominantBaseline="middle"
