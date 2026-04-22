@@ -15,41 +15,36 @@ const Vector = () => {
     if (!path || excludedIds.includes(path.id)) return;
 
     const key = `${view}-${path.id}`;
-    const currentMarker = markers[key];
 
-    // SIKLUS: Klik 1 (Tick) -> Klik 2 (Cross) -> Klik 3 (Hapus)
-    if (!currentMarker) {
-      const svg = path.ownerSVGElement;
-      const point = svg.createSVGPoint();
-      
-      // Ambil posisi klik mouse yang sebenarnya
-      point.x = e.clientX;
-      point.y = e.clientY;
+    setMarkers(prev => {
+      const currentMarker = prev[key];
+      const newMarkers = { ...prev };
 
-      // Konversi koordinat layar ke koordinat SVG
-      const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+      if (!currentMarker) {
+        // Klik 1: Buat baru (Tick)
+        const svg = path.ownerSVGElement;
+        const point = svg.createSVGPoint();
+        point.x = e.clientX;
+        point.y = e.clientY;
+        const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-      setMarkers(prev => ({
-        ...prev,
-        [key]: { 
+        newMarkers[key] = { 
           type: 'tick', 
           x: transformedPoint.x, 
           y: transformedPoint.y, 
           note: "", 
           partName: path.id.replace(/-/g, ' ').toUpperCase() 
-        }
-      }));
-    } else if (currentMarker.type === 'tick') {
-      setMarkers(prev => ({
-        ...prev,
-        [key]: { ...prev[key], type: 'cross' }
-      }));
-    } else {
-      // Klik ke-3: Hapus
-      const newMarkers = { ...markers };
-      delete newMarkers[key];
-      setMarkers(newMarkers);
-    }
+        };
+      } else if (currentMarker.type === 'tick') {
+        // Klik 2: Ubah ke Cross
+        newMarkers[key] = { ...currentMarker, type: 'cross' };
+      } else {
+        // Klik 3: Hapus
+        delete newMarkers[key];
+      }
+
+      return newMarkers;
+    });
   };
 
   const handleNoteChange = (id, note) => {
