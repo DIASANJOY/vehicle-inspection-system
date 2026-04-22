@@ -126,12 +126,12 @@ const Vector = () => {
       <style>
         {Object.keys(partStatus).map(id => {
           const type = partStatus[id];
-          const color = type === 'tick' ? '#28a745' : '#dc3545';
-          const bg = type === 'tick' ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)';
+          const color = type === 'tick' ? '#3182ce' : '#dc3545'; // Biru untuk Lulus
+          const bg = type === 'tick' ? 'rgba(49, 130, 206, 0.15)' : 'rgba(220, 53, 69, 0.15)';
           return `
             #${id} { 
               stroke: ${color} !important;
-              stroke-width: 4px !important; 
+              stroke-width: 5px !important; 
               fill: ${bg} !important;
               transition: all 0.3s ease;
             }
