@@ -112,19 +112,31 @@ const Vector = () => {
   const CurrentSVG = view === 'front' ? FrontSVG : BackSVG;
   const viewBox = view === 'front' ? "0 0 700.72 568.24" : "0 0 674.58 595.24";
 
-  // Ambil daftar ID unik yang sudah diberi tanda
-  const inspectedIds = [...new Set(Object.values(markers).map(m => m.pathId))];
+  // Kelompokkan status per bagian (ID)
+  const partStatus = {};
+  Object.values(markers).forEach(m => {
+    if (!partStatus[m.pathId] || m.type === 'cross') {
+      partStatus[m.pathId] = m.type; // Cross menang atas Tick
+    }
+  });
 
   return (
     <div className="app-wrapper">
       {/* Style Dinamis untuk Highlighting Bagian yang Terinspeksi */}
       <style>
-        {inspectedIds.map(id => `
-          #${id} { 
-            stroke-width: 4px !important; 
-            filter: brightness(0.9);
-          }
-        `).join('')}
+        {Object.keys(partStatus).map(id => {
+          const type = partStatus[id];
+          const color = type === 'tick' ? '#28a745' : '#dc3545';
+          const bg = type === 'tick' ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)';
+          return `
+            #${id} { 
+              stroke: ${color} !important;
+              stroke-width: 4px !important; 
+              fill: ${bg} !important;
+              transition: all 0.3s ease;
+            }
+          `;
+        }).join('')}
       </style>
 
       <h2 className="title">Vehicle Inspection System</h2>
