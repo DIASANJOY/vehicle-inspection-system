@@ -84,8 +84,24 @@ const Vector = () => {
     if (pressTimer.current) clearTimeout(pressTimer.current);
   };
 
+  const cycleMarker = (e, key) => {
+    e.stopPropagation();
+    setMarkers(prev => {
+      const currentMarker = prev[key];
+      if (!currentMarker) return prev;
+      
+      const newMarkers = { ...prev };
+      if (currentMarker.type === 'tick') {
+        newMarkers[key] = { ...currentMarker, type: 'cross' };
+      } else {
+        delete newMarkers[key];
+      }
+      return newMarkers;
+    });
+  };
+
   const openPopup = (e, markerId) => {
-    e.stopPropagation(); 
+    if (e) e.stopPropagation(); 
     const m = markers[markerId];
     if (m) {
       setActivePopup({ id: markerId, x: m.x, y: m.y, partName: m.partName });
@@ -168,7 +184,7 @@ const Vector = () => {
                   <g 
                     key={id} 
                     transform={`translate(${m.x}, ${m.y})`}
-                    onClick={(e) => openPopup(e, id)}
+                    onClick={(e) => cycleMarker(e, id)}
                     onContextMenu={(e) => {
                       e.preventDefault();
                       openPopup(e, id);
