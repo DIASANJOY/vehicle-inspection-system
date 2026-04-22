@@ -164,7 +164,10 @@ const Vector = () => {
         <div className="car-card">
           <div className="badge">{view === 'front' ? 'FRONT PANEL' : 'REAR PANEL'}</div>
 
-          <div className="svg-container">
+          <div 
+          className="svg-container" 
+          onContextMenu={(e) => e.preventDefault()}
+        >
             {/* Gambar Mobil (SVG yang di-import) */}
             <CurrentSVG
               className="car-svg"
