@@ -13,34 +13,39 @@ const Vector = () => {
   const pressTimer = React.useRef(null);
 
   const handleAction = (e) => {
-    if (activePopup) return; // Jangan buat tanda baru kalau pop-up lagi buka
+    if (activePopup) return; 
     
     const path = e.target.closest('[id]');
     const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
-    
     if (!path || excludedIds.includes(path.id)) return;
 
-    const svg = path.ownerSVGElement;
-    const point = svg.createSVGPoint();
-    point.x = e.clientX;
-    point.y = e.clientY;
-    const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+    const key = `${view}-${path.id}`;
 
-    // BUAT TANDA BARU
-    const newId = Date.now();
-    setMarkers(prev => ({
-      ...prev,
-      [newId]: { 
-        id: newId,
-        view: view,
-        type: 'tick', 
-        x: transformedPoint.x, 
-        y: transformedPoint.y, 
-        note: "", 
-        pathId: path.id,
-        partName: path.id.replace(/-/g, ' ').toUpperCase() 
+    setMarkers(prev => {
+      const currentMarker = prev[key];
+      const newMarkers = { ...prev };
+
+      if (!currentMarker) {
+        // Klik 1: Buat baru (Tick) di posisi klik
+        const svg = path.ownerSVGElement;
+        const point = svg.createSVGPoint();
+        point.x = e.clientX;
+        point.y = e.clientY;
+        const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+
+        newMarkers[key] = { 
+          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
+          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
+        };
+      } else if (currentMarker.type === 'tick') {
+        // Klik 2: Ubah ke Cross (Catatan tetap aman)
+        newMarkers[key] = { ...currentMarker, type: 'cross' };
+      } else {
+        // Klik 3: Hapus
+        delete newMarkers[key];
       }
-    }));
+      return newMarkers;
+    });
   };
 
   const handlePointerDown = (e) => {
@@ -53,24 +58,26 @@ const Vector = () => {
       const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
       if (!path || excludedIds.includes(path.id)) return;
 
+      const key = `${view}-${path.id}`;
       const svg = path.ownerSVGElement;
       const point = svg.createSVGPoint();
       point.x = x;
       point.y = y;
       const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-      const newId = Date.now();
-      const partName = path.id.replace(/-/g, ' ').toUpperCase();
-
-      setMarkers(prev => ({
-        ...prev,
-        [newId]: { 
-          id: newId, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
-          note: "", pathId: path.id, partName 
+      setMarkers(prev => {
+        if (prev[key]) {
+          setActivePopup({ id: key, x: prev[key].x, y: prev[key].y, partName: prev[key].partName });
+          return prev;
         }
-      }));
-      setActivePopup({ id: newId, x: transformedPoint.x, y: transformedPoint.y, partName });
-    }, 600); // 0.6 detik untuk Hold
+        const newMarker = { 
+          id: key, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
+          note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
+        };
+        setActivePopup({ id: key, x: transformedPoint.x, y: transformedPoint.y, partName: newMarker.partName });
+        return { ...prev, [key]: newMarker };
+      });
+    }, 600);
   };
 
   const handlePointerUp = () => {
@@ -177,12 +184,29 @@ const Vector = () => {
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
-                    {/* Balon Catatan jika ada isi note */}
+                    {/* Balon Catatan Dinamis (Klik untuk buka pop-up) */}
                     {m.note && (
-                      <g transform="translate(0, -35)">
-                        <rect x="-40" y="-12" width="80" height="20" rx="4" fill="rgba(0,0,0,0.7)" />
-                        <text fill="white" fontSize="9" textAnchor="middle" dominantBaseline="middle">
-                          {m.note.length > 12 ? m.note.substring(0, 10) + '...' : m.note}
+                      <g 
+                        transform="translate(0, -40)" 
+                        onClick={(e) => openPopup(e, id)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <rect 
+                          x={-(m.note.length * 3.5 + 10)} 
+                          y="-12" 
+                          width={m.note.length * 7 + 20} 
+                          height="22" 
+                          rx="6" 
+                          fill="rgba(0,0,0,0.8)" 
+                        />
+                        <text 
+                          fill="white" 
+                          fontSize="10" 
+                          fontWeight="600"
+                          textAnchor="middle" 
+                          dominantBaseline="middle"
+                        >
+                          {m.note}
                         </text>
                       </g>
                     )}
