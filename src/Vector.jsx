@@ -19,17 +19,25 @@ const Vector = () => {
 
     // SIKLUS: Klik 1 (Tick) -> Klik 2 (Cross) -> Klik 3 (Hapus)
     if (!currentMarker) {
-      // Ambil root SVG untuk kalkulasi point
       const svg = path.ownerSVGElement;
       const point = svg.createSVGPoint();
-      const bbox = path.getBBox();
-      point.x = bbox.x + bbox.width / 2;
-      point.y = bbox.y + bbox.height / 2;
-      const transformedPoint = point.matrixTransform(path.getCTM());
+      
+      // Ambil posisi klik mouse yang sebenarnya
+      point.x = e.clientX;
+      point.y = e.clientY;
+
+      // Konversi koordinat layar ke koordinat SVG
+      const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
       setMarkers(prev => ({
         ...prev,
-        [key]: { type: 'tick', x: transformedPoint.x, y: transformedPoint.y, note: "", partName: path.id.replace(/-/g, ' ').toUpperCase() }
+        [key]: { 
+          type: 'tick', 
+          x: transformedPoint.x, 
+          y: transformedPoint.y, 
+          note: "", 
+          partName: path.id.replace(/-/g, ' ').toUpperCase() 
+        }
       }));
     } else if (currentMarker.type === 'tick') {
       setMarkers(prev => ({
@@ -123,7 +131,10 @@ const Vector = () => {
               if (m.type !== 'cross') return null;
               return (
                 <div key={id} className="note-item">
-                  <span className="note-label">{m.partName}</span>
+                  <div className="note-label-group">
+                    <span className="note-label">{m.partName}</span>
+                    <span className="note-coords">X: {Math.round(m.x)}, Y: {Math.round(m.y)}</span>
+                  </div>
                   <input 
                     type="text" 
                     placeholder="Masukkan komplain/catatan di sini..."
