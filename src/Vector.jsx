@@ -342,6 +342,7 @@ const Vector = () => {
 
       <div className="info-bar">
         <span>BAGIAN: <strong>{hoverName || "PILIH BAGIAN MOBIL"}</strong></span>
+        <span className="legend">Klik: Ganti ✓/✕ | Tahan (Hold): Catatan & Hapus</span>
       </div>
 
       {/* Panel Catatan/Komplain */}
