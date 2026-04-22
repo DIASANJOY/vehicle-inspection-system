@@ -186,6 +186,15 @@ const Vector = () => {
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
+                    {/* Balon Catatan jika ada isi note */}
+                    {m.note && (
+                      <g transform="translate(0, -35)">
+                        <rect x="-40" y="-12" width="80" height="20" rx="4" fill="rgba(0,0,0,0.7)" />
+                        <text fill="white" fontSize="9" textAnchor="middle" dominantBaseline="middle">
+                          {m.note.length > 12 ? m.note.substring(0, 10) + '...' : m.note}
+                        </text>
+                      </g>
+                    )}
                   </g>
                 );
               })}
@@ -234,19 +243,11 @@ const Vector = () => {
                       }}
                     >🗑</button>
                   </div>
-                  <input 
-                    type="text" 
-                    className="popup-input"
-                    placeholder="Tulis catatan kerusakan..."
-                    value={markers[activePopup.id]?.note || ""}
-                    onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
-                    autoFocus
-                  />
                   <button 
                     className="popup-save-btn"
                     onClick={() => setActivePopup(null)}
                   >
-                    SIMPAN & KEMBALI
+                    TUTUP
                   </button>
                 </div>
               </>
