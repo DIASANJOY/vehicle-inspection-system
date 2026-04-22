@@ -8,7 +8,6 @@ const Vector = () => {
   const [markers, setMarkers] = useState({});
   const [hoverName, setHoverName] = useState("");
   const [activePopup, setActivePopup] = useState(null); // { id, x, y }
-  const [generalNote, setGeneralNote] = useState(""); // Catatan Umum
 
   // Timer untuk deteksi Long Press
   const pressTimer = React.useRef(null);
