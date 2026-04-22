@@ -789,3 +789,25 @@
   letter-spacing: 0.5px;
 }
 
+
+/* WARNA INDIKATOR (LULUS & CACAT) */
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.dot.tick {
+  background-color: #48bb78 !important;
+  border: 1.5px solid #2f855a;
+  box-shadow: 0 0 8px rgba(72, 187, 120, 0.4);
+}
+
+.dot.cross {
+  background-color: #f56565 !important;
+  border: 1.5px solid #c53030;
+  box-shadow: 0 0 8px rgba(245, 101, 101, 0.4);
+}
+
