@@ -6,8 +6,13 @@ import BackSVG from './assets/suv-back.svg?react';
 const Vector = () => {
   const [view, setView] = useState('front');
   const [markers, setMarkers] = useState(() => {
-    const saved = localStorage.getItem('vehicle_markers');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('vehicle_markers');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error("Failed to load markers:", e);
+      return {};
+    }
   });
   const [hoverName, setHoverName] = useState("");
   const [activePopup, setActivePopup] = useState(null); // { id, x, y }
@@ -45,12 +50,12 @@ const Vector = () => {
     point.y = e.clientY;
     const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-    const newId = Date.now();
+    const newId = `m-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     setMarkers(prev => ({
       ...prev,
       [newId]: { 
         id: newId, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
-        note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
+        note: "", pathId: path.id, partName: path.id.replace(/[_-]/g, ' ').toUpperCase() 
       }
     }));
   };
@@ -78,8 +83,8 @@ const Vector = () => {
           return prev;
         }
 
-        const newId = Date.now();
-        const partName = path.id.replace(/-/g, ' ').toUpperCase();
+        const newId = `m-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const partName = path.id.replace(/[_-]/g, ' ').toUpperCase();
         
         setActivePopup({ id: newId, x: transformedPoint.x, y: transformedPoint.y, partName });
         isLongPress.current = true;
@@ -390,7 +395,9 @@ const Vector = () => {
 
       {/* MODAL DATA VIEW */}
       {showDataView && (
-        <div className="data-view-overlay">
+        <div className="data-view-overlay" onClick={(e) => {
+          if (e.target.className === 'data-view-overlay') setShowDataView(false);
+        }}>
           <div className="data-view-content">
             <div className="data-view-header">
               <div className="header-main-title">
