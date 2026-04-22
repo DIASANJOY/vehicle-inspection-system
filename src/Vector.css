@@ -295,3 +295,83 @@
     width: 100%;
   }
 }
+
+/* QUICK POPUP STYLING */
+.quick-popup {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #edf2f7;
+  animation: zoomIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: auto;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.popup-header span {
+  font-size: 10px;
+  font-weight: 800;
+  color: #4a5568;
+}
+
+.popup-header button {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.action-btn.active { color: white; border-color: transparent; }
+.action-btn.tick.active { background: #28a745; }
+.action-btn.cross.active { background: #dc3545; }
+.action-btn.delete:hover { background: #fff5f5; color: #dc3545; border-color: #feb2b2; }
+
+.popup-input {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+.popup-input:focus {
+  border-color: #3182ce;
+}
+

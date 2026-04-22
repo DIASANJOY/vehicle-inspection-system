@@ -7,6 +7,10 @@ const Vector = () => {
   const [view, setView] = useState('front');
   const [markers, setMarkers] = useState({});
   const [hoverName, setHoverName] = useState("");
+  const [activePopup, setActivePopup] = useState(null); // { id, x, y }
+  
+  // Timer untuk deteksi Long Press
+  const pressTimer = React.useRef(null);
 
   const handleAction = (e) => {
     const path = e.target.closest('[id]');
@@ -20,21 +24,55 @@ const Vector = () => {
     point.y = e.clientY;
     const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-    // BUAT TANDA BARU (Setiap klik buat tanda baru dengan ID unik)
+    // BUAT TANDA BARU
     const newId = Date.now();
     setMarkers(prev => ({
       ...prev,
       [newId]: { 
         id: newId,
-        view: view, // Simpan view agar tanda tidak muncul di sisi lain
+        view: view,
         type: 'tick', 
         x: transformedPoint.x, 
         y: transformedPoint.y, 
         note: "", 
-        pathId: path.id, // Simpan ID asli untuk highlighting
+        pathId: path.id,
         partName: path.id.replace(/-/g, ' ').toUpperCase() 
       }
     }));
+  };
+
+  const handlePointerDown = (e) => {
+    const x = e.clientX;
+    const y = e.clientY;
+    const target = e.target;
+
+    pressTimer.current = setTimeout(() => {
+      const path = target.closest('[id]');
+      const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
+      if (!path || excludedIds.includes(path.id)) return;
+
+      const svg = path.ownerSVGElement;
+      const point = svg.createSVGPoint();
+      point.x = x;
+      point.y = y;
+      const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+
+      const newId = Date.now();
+      const partName = path.id.replace(/-/g, ' ').toUpperCase();
+
+      setMarkers(prev => ({
+        ...prev,
+        [newId]: { 
+          id: newId, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
+          note: "", pathId: path.id, partName 
+        }
+      }));
+      setActivePopup({ id: newId, x: transformedPoint.x, y: transformedPoint.y, partName });
+    }, 600); // 0.6 detik untuk Hold
+  };
+
+  const handlePointerUp = () => {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
   };
 
   const cycleMarker = (e, markerId) => {
@@ -103,6 +141,9 @@ const Vector = () => {
             <CurrentSVG 
               className="car-svg"
               onClick={handleAction}
+              onPointerDown={handlePointerDown}
+              onPointerUp={handlePointerUp}
+              onPointerLeave={handlePointerUp}
               onMouseOver={handleHover}
             />
 
@@ -116,6 +157,10 @@ const Vector = () => {
                     key={id} 
                     transform={`translate(${m.x}, ${m.y})`}
                     onClick={(e) => cycleMarker(e, id)}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setActivePopup({ id, x: m.x, y: m.y, partName: m.partName });
+                    }}
                     className="marker-group"
                   >
                     <circle r="18" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="2" />
@@ -130,6 +175,52 @@ const Vector = () => {
                   </g>
                 );
               })}
+
+              {/* Pop-up Cepat (Quick Action) */}
+              {activePopup && (
+                <foreignObject 
+                  x={activePopup.x - 100} 
+                  y={activePopup.y - 160} 
+                  width="200" 
+                  height="150"
+                  style={{ overflow: 'visible' }}
+                >
+                  <div className="quick-popup">
+                    <div className="popup-header">
+                      <span>{activePopup.partName}</span>
+                      <button onClick={() => setActivePopup(null)}>✕</button>
+                    </div>
+                    <div className="popup-actions">
+                      <button 
+                        className={`action-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
+                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' }}))}
+                      >✓</button>
+                      <button 
+                        className={`action-btn cross ${markers[activePopup.id]?.type === 'cross' ? 'active' : ''}`}
+                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' }}))}
+                      >✕</button>
+                      <button 
+                        className="action-btn delete"
+                        onClick={() => {
+                          setMarkers(prev => {
+                            const n = { ...prev };
+                            delete n[activePopup.id];
+                            return n;
+                          });
+                          setActivePopup(null);
+                        }}
+                      >🗑</button>
+                    </div>
+                    <input 
+                      type="text" 
+                      className="popup-input"
+                      placeholder="Catatan..."
+                      value={markers[activePopup.id]?.note || ""}
+                      onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
+                    />
+                  </div>
+                </foreignObject>
+              )}
             </svg>
           </div>
         </div>
