@@ -228,34 +228,54 @@
 /* RESPONSIVE FOR MOBILE */
 @media (max-width: 768px) {
   .app-wrapper {
-    padding: 10px;
+    padding: 20px 15px;
+    justify-content: flex-start; /* Agar bisa scroll jika konten panjang */
+    min-height: 100vh;
   }
 
-  .title { font-size: 20px; }
-  .subtitle { font-size: 12px; margin-bottom: 20px; }
+  .title, .subtitle { 
+    text-align: center; 
+    width: 100%;
+  }
 
   .main-stage {
     display: grid;
     grid-template-areas: 
       "card card"
       "prev next";
-    gap: 15px;
+    gap: 20px;
+    justify-items: center;
+    align-items: center;
+    width: 100%;
   }
 
   .car-card {
     grid-area: card;
-    padding: 30px 15px;
+    padding: 40px 15px; /* Padding disesuaikan */
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .badge {
+    left: 50%;
+    transform: translateX(-50%); /* Badge jadi di tengah di mobile */
+    top: 15px;
   }
 
   .btn-nav {
-    width: 45px;
-    height: 45px;
-    font-size: 18px;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 20px;
   }
 
-  .btn-nav:nth-of-type(1) { grid-area: prev; justify-self: end; }
-  .btn-nav:nth-of-type(2) { grid-area: next; justify-self: start; }
+  .btn-nav:nth-of-type(1) { grid-area: prev; margin-right: 10px; }
+  .btn-nav:nth-of-type(2) { grid-area: next; margin-left: 10px; }
+
+  .info-bar {
+    width: 100%;
+    box-sizing: border-box;
+  }
 
   .note-item {
     flex-direction: column;
