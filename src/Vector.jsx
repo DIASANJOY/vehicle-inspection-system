@@ -184,30 +184,47 @@ const Vector = () => {
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
-                    {/* Balon Catatan Dinamis (Klik untuk buka pop-up) */}
+                    {/* Ikon/Balon Catatan (Toggle Show/Hide) */}
                     {m.note && (
                       <g 
                         transform="translate(0, -40)" 
-                        onClick={(e) => openPopup(e, id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMarkers(prev => ({
+                            ...prev,
+                            [id]: { ...prev[id], showNote: !prev[id].showNote }
+                          }));
+                        }}
                         style={{ cursor: 'pointer' }}
                       >
-                        <rect 
-                          x={-(m.note.length * 3.5 + 10)} 
-                          y="-12" 
-                          width={m.note.length * 7 + 20} 
-                          height="22" 
-                          rx="6" 
-                          fill="rgba(0,0,0,0.8)" 
-                        />
-                        <text 
-                          fill="white" 
-                          fontSize="10" 
-                          fontWeight="600"
-                          textAnchor="middle" 
-                          dominantBaseline="middle"
-                        >
-                          {m.note}
-                        </text>
+                        {!m.showNote ? (
+                          // Tampilan Ikon Kecil saat disembunyikan
+                          <g>
+                            <circle r="10" fill="#3182ce" />
+                            <text fill="white" fontSize="8" textAnchor="middle" dominantBaseline="middle">💬</text>
+                          </g>
+                        ) : (
+                          // Tampilan Teks Lengkap saat diklik
+                          <g>
+                            <rect 
+                              x={-(m.note.length * 3.5 + 10)} 
+                              y="-12" 
+                              width={m.note.length * 7 + 20} 
+                              height="22" 
+                              rx="6" 
+                              fill="rgba(0,0,0,0.9)" 
+                            />
+                            <text 
+                              fill="white" 
+                              fontSize="10" 
+                              fontWeight="600"
+                              textAnchor="middle" 
+                              dominantBaseline="middle"
+                            >
+                              {m.note}
+                            </text>
+                          </g>
+                        )}
                       </g>
                     )}
                   </g>
