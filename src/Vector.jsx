@@ -20,6 +20,11 @@ const Vector = () => {
   const [copyStatus, setCopyStatus] = useState("Copy JSON");
   const [dataTab, setDataTab] = useState('table'); // 'table' | 'json'
 
+  // Fitur Baru
+  const [activeTool, setActiveTool] = useState('tick'); // 'tick' | 'cross' | 'delete'
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+
   // Timer untuk deteksi Long Press
   const pressTimer = React.useRef(null);
   const isLongPress = React.useRef(false); // Flag untuk mencegah klik setelah hold
@@ -34,6 +39,8 @@ const Vector = () => {
       isLongPress.current = false; // Reset flag
       return; 
     }
+    
+    if (activeTool === 'delete') return; // Klik di area kosong tidak melakukan apa-apa jika alat hapus aktif
 
     const path = e.target.closest('[id]');
     const markersOnPart = Object.values(markers).filter(m => m.pathId === path?.id && m.view === view).length;
@@ -43,28 +50,21 @@ const Vector = () => {
       return;
     }
 
-    // Selalu buat tanda baru jika klik di area kosong mobil
     const svg = path.ownerSVGElement;
     const point = svg.createSVGPoint();
     point.x = e.clientX;
     point.y = e.clientY;
     const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-    // Hitung posisi RELATIF (%) terhadap bounding box bagian tersebut
-    const bbox = path.getBBox();
-    const relX = ((transformedPoint.x - bbox.x) / bbox.width) * 100;
-    const relY = ((transformedPoint.y - bbox.y) / bbox.height) * 100;
-
-    const newId = `m-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const newId = Date.now();
     setMarkers(prev => ({
       ...prev,
       [newId]: { 
-        id: newId, view, type: 'tick', 
-        relX, relY, // Simpan sebagai %
-        x: transformedPoint.x, y: transformedPoint.y, // Tetap simpan absolute untuk kemudahan render
-        note: "", pathId: path.id, partName: path.id.replace(/[_-]/g, ' ').toUpperCase() 
+        id: newId, view, type: activeTool, x: transformedPoint.x, y: transformedPoint.y, 
+        note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
       }
     }));
+    setSelectedMarkerId(newId);
   };
 
   const handlePointerDown = (e) => {
@@ -88,29 +88,21 @@ const Vector = () => {
       const relX = ((transformedPoint.x - bbox.x) / bbox.width) * 100;
       const relY = ((transformedPoint.y - bbox.y) / bbox.height) * 100;
 
-      setMarkers(prev => {
-        const markersOnPart = Object.values(prev).filter(m => m.pathId === path?.id && m.view === view).length;
-        if (markersOnPart >= 4) {
-          alert(`Maksimal 4 tanda pada bagian ${path.id.toUpperCase()} diperbolehkan.`);
-          return prev;
-        }
-
-        const newId = `m-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-        const partName = path.id.replace(/[_-]/g, ' ').toUpperCase();
+      const newId = `m-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const partName = path.id.replace(/[_-]/g, ' ').toUpperCase();
         
-        setActivePopup({ id: newId, x: transformedPoint.x, y: transformedPoint.y, partName });
-        isLongPress.current = true;
+      setActivePopup({ id: newId, x: transformedPoint.x, y: transformedPoint.y, partName });
+      isLongPress.current = true;
         
-        return { 
-          ...prev, 
-          [newId]: { 
-            id: newId, view, type: 'tick', 
-            relX, relY, 
-            x: transformedPoint.x, y: transformedPoint.y, 
-            note: "", pathId: path.id, partName 
-          } 
-        };
-      });
+      setMarkers(prev => ({ 
+        ...prev, 
+        [newId]: { 
+          id: newId, view, type: 'tick', 
+          relX, relY, 
+          x: transformedPoint.x, y: transformedPoint.y, 
+          note: "", pathId: path.id, partName 
+        } 
+      }));
     }, 600);
   };
 
@@ -118,27 +110,17 @@ const Vector = () => {
     if (pressTimer.current) clearTimeout(pressTimer.current);
   };
 
-  const cycleMarker = (e, key) => {
+  const handleActionOnMarker = (e, id) => {
     e.stopPropagation();
-    setMarkers(prev => {
-      const currentMarker = prev[key];
-      if (!currentMarker) return prev;
-
-      const newMarkers = { ...prev };
-      // Toggle antara Tick <-> Cross (Agar catatan tidak hilang)
-      newMarkers[key] = { 
-        ...currentMarker, 
-        type: currentMarker.type === 'tick' ? 'cross' : 'tick' 
-      };
-      return newMarkers;
-    });
-  };
-
-  const openPopup = (e, markerId) => {
-    if (e) e.stopPropagation();
-    const m = markers[markerId];
-    if (m) {
-      setActivePopup({ id: markerId, x: m.x, y: m.y, partName: m.partName });
+    if (activeTool === 'delete') {
+      setMarkers(prev => {
+        const n = { ...prev };
+        delete n[id];
+        return n;
+      });
+      if (selectedMarkerId === id) setSelectedMarkerId(null);
+    } else {
+      setSelectedMarkerId(id);
     }
   };
 
@@ -172,7 +154,6 @@ const Vector = () => {
 
   return (
     <div className="app-wrapper">
-      {/* Style Dinamis untuk Highlighting Bagian yang Terinspeksi */}
       <style>
         {Object.keys(partStatus).map(pathId => {
           const status = partStatus[pathId];
@@ -190,19 +171,30 @@ const Vector = () => {
       </style>
 
       <h2 className="title">Vehicle Inspection System</h2>
-      <p className="subtitle">Klik: Ganti ✓/✕ | KLIK KANAN / Tahan (Hold): Catatan & Hapus</p>
+      <p className="subtitle">Pilih Alat (✓/✕/🗑) lalu klik pada bagian mobil</p>
 
       <div className="main-stage">
+        <div className="zoom-controls">
+          <button className="zoom-btn" onClick={() => setZoomLevel(prev => Math.min(prev + 0.2, 3))}>+</button>
+          <button className="zoom-btn" onClick={() => setZoomLevel(prev => Math.max(prev - 0.2, 1))}>-</button>
+        </div>
+
         <button className="btn-nav" onClick={() => setView(v => v === 'front' ? 'back' : 'front')}>❮</button>
 
         <div className="car-card">
           <div className="badge">{view === 'front' ? 'FRONT PANEL' : 'REAR PANEL'}</div>
+          
+          <div className="tools-panel">
+            <button className={`tool-btn tick ${activeTool === 'tick' ? 'active' : ''}`} onClick={() => setActiveTool('tick')}>✓</button>
+            <button className={`tool-btn cross ${activeTool === 'cross' ? 'active' : ''}`} onClick={() => setActiveTool('cross')}>✕</button>
+            <button className={`tool-btn delete ${activeTool === 'delete' ? 'active' : ''}`} onClick={() => setActiveTool('delete')}>🗑</button>
+          </div>
 
           <div 
           className="svg-container" 
+          style={{ transform: `scale(${zoomLevel})`, transition: 'transform 0.2s' }}
           onContextMenu={(e) => e.preventDefault()}
         >
-            {/* Gambar Mobil (SVG yang di-import) */}
             <CurrentSVG
               className="car-svg"
               onClick={handleAction}
@@ -212,7 +204,6 @@ const Vector = () => {
               onMouseOver={handleHover}
             />
 
-            {/* Overlay Penanda (SVG transparan dengan viewBox yang sama) */}
             <svg viewBox={viewBox} className="marker-overlay">
               {Object.keys(markers).map(id => {
                 const m = markers[id];
@@ -221,13 +212,12 @@ const Vector = () => {
                   <g
                     key={id}
                     transform={`translate(${m.x}, ${m.y})`}
-                    onClick={(e) => cycleMarker(e, id)}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      openPopup(e, id);
-                    }}
-                    className="marker-group"
+                    onClick={(e) => handleActionOnMarker(e, id)}
+                    className={`marker-group ${selectedMarkerId === id ? 'selected' : ''}`}
                   >
+                    {selectedMarkerId === id && (
+                      <circle className="marker-glow" r="30" fill="rgba(255, 107, 107, 0.4)" />
+                    )}
                     <circle r="22" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="3" />
                     <text
                       className={`symbol ${m.type}`}
@@ -239,56 +229,11 @@ const Vector = () => {
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
-                    {/* Ikon/Balon Catatan (Toggle Show/Hide) dengan Smart Positioning */}
-                    {m.note && (
-                      <g 
-                        transform={`translate(0, ${m.y < 50 ? 40 : -40})`} 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setMarkers(prev => ({
-                            ...prev,
-                            [id]: { ...prev[id], showNote: !prev[id].showNote }
-                          }));
-                        }}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {!m.showNote ? (
-                          // Tampilan Ikon Amplop saat disembunyikan (UKURAN JUMBO)
-                          <g>
-                            <circle r="20" fill="#3182ce" stroke="white" strokeWidth="2" />
-                            <text fill="white" fontSize="20" textAnchor="middle" dominantBaseline="middle">✉️</text>
-                          </g>
-                        ) : (
-                          // Tampilan Teks Lengkap saat diklik
-                          <g>
-                            <rect
-                              x={-(m.note.length * 6 + 20)}
-                              y="-20"
-                              width={m.note.length * 12 + 40}
-                              height="40"
-                              rx="10"
-                              fill="rgba(0,0,0,0.95)"
-                            />
-                            <text
-                              fill="white"
-                              fontSize="18"
-                              fontWeight="bold"
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                            >
-                              {m.note}
-                            </text>
-                          </g>
-                        )}
-                      </g>
-                    )}
                   </g>
                 );
               })}
-
             </svg>
-
-            {/* Pop-up Cepat (Quick Action) - Sekarang di Luar SVG agar tidak terpotong & bisa diklik */}
+            
             {activePopup && (
               <>
                 <div
@@ -310,7 +255,6 @@ const Vector = () => {
                     <button onClick={() => setActivePopup(null)}>✕</button>
                   </div>
                   <div className="popup-body">
-                    {/* Pilih Status Langsung di Pop-up */}
                     <div className="popup-status-selector">
                       <button
                         className={`status-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
@@ -321,56 +265,17 @@ const Vector = () => {
                         onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' } }))}
                       >✕ CACAT</button>
                     </div>
-
-                    <div className="part-info">
-                      <span className="info-label">POSISI RELATIF:</span>
-                      <span className="info-value">X: {Math.round(markers[activePopup.id]?.relX)}%, Y: {Math.round(markers[activePopup.id]?.relY)}%</span>
-                    </div>
-
-                    {/* Quick Tags untuk Mempercepat Kerja User */}
-                    <div className="quick-tags">
-                      {["Lecet", "Penyok", "Pecah", "Kusam", "Hilang"].map(tag => (
-                        <button
-                          key={tag}
-                          className="tag-btn"
-                          onClick={() => {
-                            const currentNote = markers[activePopup.id]?.note || "";
-                            const newNote = currentNote ? `${currentNote}, ${tag}` : tag;
-                            handleNoteChange(activePopup.id, newNote);
-                          }}
-                        >
-                          +{tag}
-                        </button>
-                      ))}
-                    </div>
-
                     <div className="notes-input-group">
-                      <label className="notes-label">📩 ISI CATATAN / KOMPLAIN:</label>
+                      <label className="notes-label">📩 ISI CATATAN:</label>
                       <textarea
                         className="popup-textarea"
-                        placeholder="Tulis catatan tambahan di sini..."
                         value={markers[activePopup.id]?.note || ""}
                         onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
                         autoFocus
                       />
                     </div>
-
                     <div className="popup-footer">
-                      <button
-                        className="popup-delete-btn"
-                        onClick={() => {
-                          setMarkers(prev => {
-                            const n = { ...prev };
-                            delete n[activePopup.id];
-                            return n;
-                          });
-                          setActivePopup(null);
-                        }}
-                      >🗑 Hapus Tanda</button>
-                      <button
-                        className="popup-save-btn"
-                        onClick={() => setActivePopup(null)}
-                      >SIMPAN</button>
+                      <button className="popup-save-btn" onClick={() => setActivePopup(null)}>SIMPAN</button>
                     </div>
                   </div>
                 </div>
@@ -384,12 +289,51 @@ const Vector = () => {
 
       <div className="info-bar">
         <span>BAGIAN: <strong>{hoverName || "PILIH BAGIAN MOBIL"}</strong></span>
-        <span className="legend">Klik: Ganti ✓/✕ | Tahan (Hold): Catatan & Hapus</span>
       </div>
 
-      {/* Footer Berdasarkan Sketsa User: Dua Baris Horizontal */}
+      <div className="inspection-form-container">
+        <div className="form-header-badge">BAGIAN MOBIL</div>
+        {(() => {
+          const grouped = {};
+          Object.values(markers).forEach(m => {
+            if (!grouped[m.pathId]) grouped[m.pathId] = { name: m.partName, items: [] };
+            grouped[m.pathId].items.push(m);
+          });
+          
+          const panels = Object.values(grouped);
+          if (panels.length === 0) return <div className="empty-form">Belum ada bagian yang ditandai.</div>;
+
+          return panels.map((panel, idx) => (
+            <div key={idx} className="panel-group-card">
+              <div className="panel-header">{panel.name}</div>
+              <div className="markers-list">
+                {panel.items.map((item, i) => (
+                  <div key={item.id} className={`marker-item-row ${selectedMarkerId === item.id ? 'active' : ''}`}>
+                    <div className="marker-main-info" onClick={() => setSelectedMarkerId(item.id === selectedMarkerId ? null : item.id)}>
+                      <span className="marker-index">{i + 1}.</span>
+                      <span className={`marker-type-icon ${item.type}`}>{item.type === 'tick' ? '✓' : '✕'}</span>
+                      <span className="marker-coords">COORD: {Math.round(item.x)}, {Math.round(item.y)}</span>
+                    </div>
+                    {selectedMarkerId === item.id && (
+                      <div className="marker-note-input-wrapper">
+                        <textarea 
+                          placeholder="Tambahkan catatan khusus untuk bagian ini..."
+                          value={item.note}
+                          onChange={(e) => handleNoteChange(item.id, e.target.value)}
+                          className="marker-textarea"
+                          autoFocus
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ));
+        })()}
+      </div>
+
       <div className="wireframe-footer">
-        {/* Baris 1: Ringkasan Stats */}
         <div className="footer-bar stats-bar">
           <div className="stat-item"><span className="dot tick"></span> <strong>{Object.values(markers).filter(m => m.type === 'tick').length}</strong> LULUS</div>
           <div className="stat-item"><span className="dot cross"></span> <strong>{Object.values(markers).filter(m => m.type === 'cross').length}</strong> CACAT</div>
