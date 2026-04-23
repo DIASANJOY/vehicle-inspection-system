@@ -25,9 +25,7 @@ const Vector = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
 
-  // Timer untuk deteksi Long Press
-  const pressTimer = React.useRef(null);
-  const isLongPress = React.useRef(false); // Flag untuk mencegah klik setelah hold
+  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
 
   // Save to localStorage
   React.useEffect(() => {
@@ -35,10 +33,7 @@ const Vector = () => {
   }, [markers]);
 
   const handleAction = (e) => {
-    if (activePopup || isLongPress.current) {
-      isLongPress.current = false; // Reset flag
-      return; 
-    }
+    if (activePopup) return; 
     
     if (activeTool === 'delete') return; // Klik di area kosong tidak melakukan apa-apa jika alat hapus aktif
 
@@ -67,48 +62,8 @@ const Vector = () => {
     setSelectedMarkerId(newId);
   };
 
-  const handlePointerDown = (e) => {
-    const x = e.clientX;
-    const y = e.clientY;
-    const target = e.target;
-
-    pressTimer.current = setTimeout(() => {
-      const path = target.closest('[id]');
-      const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
-      if (!path || excludedIds.includes(path.id)) return;
-
-      const svg = path.ownerSVGElement;
-      const point = svg.createSVGPoint();
-      point.x = x;
-      point.y = y;
-      const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-
-      // Hitung posisi RELATIF (%) terhadap bounding box bagian tersebut
-      const bbox = path.getBBox();
-      const relX = ((transformedPoint.x - bbox.x) / bbox.width) * 100;
-      const relY = ((transformedPoint.y - bbox.y) / bbox.height) * 100;
-
-      const newId = `m-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      const partName = path.id.replace(/[_-]/g, ' ').toUpperCase();
-        
-      setActivePopup({ id: newId, x: transformedPoint.x, y: transformedPoint.y, partName });
-      isLongPress.current = true;
-        
-      setMarkers(prev => ({ 
-        ...prev, 
-        [newId]: { 
-          id: newId, view, type: 'tick', 
-          relX, relY, 
-          x: transformedPoint.x, y: transformedPoint.y, 
-          note: "", pathId: path.id, partName 
-        } 
-      }));
-    }, 600);
-  };
-
-  const handlePointerUp = () => {
-    if (pressTimer.current) clearTimeout(pressTimer.current);
-  };
+  const handlePointerUp = () => {};
+  const handlePointerDown = () => {};
 
   const handleActionOnMarker = (e, id) => {
     e.stopPropagation();
@@ -228,6 +183,13 @@ const Vector = () => {
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
+                    {/* Indikator Pesan/Catatan (Balon Kecil) */}
+                    {m.note && (
+                      <g transform="translate(15, -15)">
+                        <circle r="8" fill="#3182ce" stroke="white" strokeWidth="1.5" />
+                        <text fill="white" fontSize="8" textAnchor="middle" dominantBaseline="middle">✉</text>
+                      </g>
+                    )}
                   </g>
                 );
               })}
