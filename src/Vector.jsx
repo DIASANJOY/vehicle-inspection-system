@@ -120,6 +120,11 @@ const Vector = () => {
       });
       if (selectedMarkerId === id) setSelectedMarkerId(null);
     } else {
+      // Update status penanda sesuai alat yang aktif (✓ atau ✕)
+      setMarkers(prev => ({
+        ...prev,
+        [id]: { ...prev[id], type: activeTool }
+      }));
       setSelectedMarkerId(id);
     }
   };
@@ -183,12 +188,6 @@ const Vector = () => {
 
         <div className="car-card">
           <div className="badge">{view === 'front' ? 'FRONT PANEL' : 'REAR PANEL'}</div>
-          
-          <div className="tools-panel">
-            <button className={`tool-btn tick ${activeTool === 'tick' ? 'active' : ''}`} onClick={() => setActiveTool('tick')}>✓</button>
-            <button className={`tool-btn cross ${activeTool === 'cross' ? 'active' : ''}`} onClick={() => setActiveTool('cross')}>✕</button>
-            <button className={`tool-btn delete ${activeTool === 'delete' ? 'active' : ''}`} onClick={() => setActiveTool('delete')}>🗑</button>
-          </div>
 
           <div 
           className="svg-container" 
@@ -289,6 +288,12 @@ const Vector = () => {
 
       <div className="info-bar">
         <span>BAGIAN: <strong>{hoverName || "PILIH BAGIAN MOBIL"}</strong></span>
+      </div>
+
+      <div className="tools-panel">
+        <button className={`tool-btn tick ${activeTool === 'tick' ? 'active' : ''}`} onClick={() => setActiveTool('tick')}>✓</button>
+        <button className={`tool-btn cross ${activeTool === 'cross' ? 'active' : ''}`} onClick={() => setActiveTool('cross')}>✕</button>
+        <button className={`tool-btn delete ${activeTool === 'delete' ? 'active' : ''}`} onClick={() => setActiveTool('delete')}>🗑</button>
       </div>
 
       <div className="inspection-form-container">
