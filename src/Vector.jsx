@@ -401,10 +401,9 @@ const Vector = () => {
             {showDataView ? "📊 KEMBALI KE VISUAL" : "📋 LIHAT DATA TABLE"}
           </button>
           <button className="footer-bar submit-bar" onClick={() => {
-            setShowDataView(true);
-            setTimeout(() => {
-              alert("Data siap untuk diekspor! Silakan salin JSON atau download file.");
-            }, 500);
+            // Simulasi pengiriman data
+            console.log("Exporting markers:", markers);
+            alert("✅ Laporan Inspeksi Berhasil Dikirim!");
           }}>
             📩 KIRIM / EXPORT DATA
           </button>
