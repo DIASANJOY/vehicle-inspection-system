@@ -50,11 +50,18 @@ const Vector = () => {
     point.y = e.clientY;
     const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
+    // Hitung posisi RELATIF (%) terhadap bounding box bagian tersebut
+    const bbox = path.getBBox();
+    const relX = ((transformedPoint.x - bbox.x) / bbox.width) * 100;
+    const relY = ((transformedPoint.y - bbox.y) / bbox.height) * 100;
+
     const newId = `m-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     setMarkers(prev => ({
       ...prev,
       [newId]: { 
-        id: newId, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, 
+        id: newId, view, type: 'tick', 
+        relX, relY, // Simpan sebagai %
+        x: transformedPoint.x, y: transformedPoint.y, // Tetap simpan absolute untuk kemudahan render
         note: "", pathId: path.id, partName: path.id.replace(/[_-]/g, ' ').toUpperCase() 
       }
     }));
@@ -76,6 +83,11 @@ const Vector = () => {
       point.y = y;
       const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
+      // Hitung posisi RELATIF (%) terhadap bounding box bagian tersebut
+      const bbox = path.getBBox();
+      const relX = ((transformedPoint.x - bbox.x) / bbox.width) * 100;
+      const relY = ((transformedPoint.y - bbox.y) / bbox.height) * 100;
+
       setMarkers(prev => {
         const markersOnPart = Object.values(prev).filter(m => m.pathId === path?.id && m.view === view).length;
         if (markersOnPart >= 4) {
@@ -91,7 +103,12 @@ const Vector = () => {
         
         return { 
           ...prev, 
-          [newId]: { id: newId, view, type: 'tick', x: transformedPoint.x, y: transformedPoint.y, note: "", pathId: path.id, partName } 
+          [newId]: { 
+            id: newId, view, type: 'tick', 
+            relX, relY, 
+            x: transformedPoint.x, y: transformedPoint.y, 
+            note: "", pathId: path.id, partName 
+          } 
         };
       });
     }, 600);
@@ -305,8 +322,8 @@ const Vector = () => {
                     </div>
 
                     <div className="part-info">
-                      <span className="info-label">KOORDINAT:</span>
-                      <span className="info-value">X: {Math.round(activePopup.x)}, Y: {Math.round(activePopup.y)}</span>
+                      <span className="info-label">POSISI RELATIF:</span>
+                      <span className="info-value">X: {Math.round(markers[activePopup.id]?.relX)}%, Y: {Math.round(markers[activePopup.id]?.relY)}%</span>
                     </div>
 
                     {/* Quick Tags untuk Mempercepat Kerja User */}
@@ -458,6 +475,7 @@ const Vector = () => {
                         <th>Panel / Bagian</th>
                         <th>View</th>
                         <th>Status Akhir</th>
+                        <th>Posisi (%)</th>
                         <th>Jumlah Tanda</th>
                         <th>Catatan Terakumulasi</th>
                       </tr>
@@ -472,19 +490,29 @@ const Vector = () => {
                               view: m.view, 
                               type: 'tick', 
                               count: 0, 
+                              sumX: 0,
+                              sumY: 0,
                               notes: [] 
                             };
                           }
                           grouped[m.pathId].count++;
+                          grouped[m.pathId].sumX += m.relX;
+                          grouped[m.pathId].sumY += m.relY;
                           if (m.type === 'cross') grouped[m.pathId].type = 'cross';
                           if (m.note) grouped[m.pathId].notes.push(m.note);
                         });
 
-                        const rows = Object.values(grouped);
+                        const rows = Object.values(grouped).map(g => ({
+                          ...g,
+                          avgPos: {
+                            x: Math.round(g.sumX / g.count),
+                            y: Math.round(g.sumY / g.count)
+                          }
+                        }));
                         if (rows.length === 0) {
                           return (
                             <tr>
-                              <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#a0aec0' }}>
+                              <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#a0aec0' }}>
                                 Belum ada data inspeksi.
                               </td>
                             </tr>
@@ -499,6 +527,10 @@ const Vector = () => {
                               <span className={`status-badge ${panel.type}`}>
                                 {panel.type === 'tick' ? 'LULUS' : 'CACAT'}
                               </span>
+                            </td>
+                            <td className="coord-cell">
+                              {/* Menampilkan rata-rata posisi jika ada banyak tanda, atau tanda pertama */}
+                              {panel.avgPos.x}%, {panel.avgPos.y}%
                             </td>
                             <td>{panel.count} tanda</td>
                             <td className="note-cell">
