@@ -174,12 +174,13 @@ const Vector = () => {
     <div className="app-wrapper">
       {/* Style Dinamis untuk Highlighting Bagian yang Terinspeksi */}
       <style>
-        {Object.keys(markers).map(id => {
-          const m = markers[id];
-          const color = m.type === 'tick' ? '#3182ce' : '#e53e3e';
+        {Object.keys(partStatus).map(pathId => {
+          const status = partStatus[pathId];
+          const color = status === 'tick' ? '#3182ce' : '#e53e3e';
+          const bgColor = status === 'tick' ? 'rgba(49, 130, 206, 0.15)' : 'rgba(229, 62, 62, 0.15)';
           return `
-            #${m.pathId}, #${m.pathId} path, #${m.pathId} polyline, #${m.pathId} polygon { 
-              fill: ${m.type === 'tick' ? 'rgba(49, 130, 206, 0.15)' : 'rgba(229, 62, 62, 0.15)'} !important; 
+            #${pathId}, #${pathId} path, #${pathId} polyline, #${pathId} polygon { 
+              fill: ${bgColor} !important; 
               stroke: ${color} !important;
               stroke-width: 5px !important;
               transition: all 0.3s ease;
