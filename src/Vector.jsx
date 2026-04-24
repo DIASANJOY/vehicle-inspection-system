@@ -55,7 +55,7 @@ const Vector = () => {
     const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
     // --- FITUR BARU: CEK JARAK (ANTI-STACKING) ---
-    const minDistance = 25; // Jarak minimal antar marker
+    const minDistance = 60; // Jarak minimal agar marker tidak saling bersentuhan (Diameter=56)
     const isTooClose = Object.values(markers).some(m => {
       if (m.view !== view) return false;
       const dx = m.x - transformedPoint.x;
