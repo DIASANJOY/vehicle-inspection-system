@@ -24,6 +24,14 @@ const Vector = () => {
   const [activeTool, setActiveTool] = useState('tick'); // 'tick' | 'cross' | 'delete'
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+  
+  // State untuk data yang sudah resmi "dikirim/disimpan"
+  const [finalMarkers, setFinalMarkers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vehicle_markers');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) { return {}; }
+  });
 
   // Save to localStorage dihilangkan agar tidak otomatis tersimpan
 
@@ -338,10 +346,11 @@ const Vector = () => {
             {showDataView ? "📊 KEMBALI KE VISUAL" : "📋 LIHAT DATA TABLE"}
           </button>
           <button className="footer-bar submit-bar" onClick={() => {
-            // Simpan ke localStorage hanya saat tombol ini diklik
+            // Pindahkan data dari draft (markers) ke finalMarkers
+            setFinalMarkers(markers);
             localStorage.setItem('vehicle_markers', JSON.stringify(markers));
-            console.log("Data saved to storage and exported:", markers);
-            alert("✅ Data berhasil disimpan ke memori dan laporan siap dikirim!");
+            console.log("Data committed and saved:", markers);
+            alert("✅ Data berhasil disimpan ke tabel dan memori!");
           }}>
             📩 SIMPAN & KIRIM DATA
           </button>
@@ -357,9 +366,9 @@ const Vector = () => {
             <div className="data-view-header">
               <div className="header-main-title">
                 <h3>DATA HASIL INSPEKSI</h3>
-                {Object.values(markers).length > 0 && (
-                  <span className={`overall-badge ${Object.values(markers).some(m => m.type === 'cross') ? 'failed' : 'passed'}`}>
-                    KESIMPULAN: {Object.values(markers).some(m => m.type === 'cross') ? 'CACAT (PERLU PERBAIKAN)' : 'LULUS (KONDISI BAIK)'}
+                {Object.values(finalMarkers).length > 0 && (
+                  <span className={`overall-badge ${Object.values(finalMarkers).some(m => m.type === 'cross') ? 'failed' : 'passed'}`}>
+                    KESIMPULAN: {Object.values(finalMarkers).some(m => m.type === 'cross') ? 'CACAT (PERLU PERBAIKAN)' : 'LULUS (KONDISI BAIK)'}
                   </span>
                 )}
               </div>
@@ -378,12 +387,13 @@ const Vector = () => {
                 <button className="export-btn reset" onClick={() => {
                   if (window.confirm("Hapus semua data inspeksi?")) {
                     setMarkers({});
+                    setFinalMarkers({});
                     localStorage.removeItem('vehicle_markers');
                   }
                 }} style={{ background: '#fff5f5', color: '#c53030', border: '1px solid #feb2b2' }}>Reset</button>
                 
                 <button className="export-btn copy" onClick={() => {
-                  navigator.clipboard.writeText(JSON.stringify(markers, null, 2));
+                  navigator.clipboard.writeText(JSON.stringify(finalMarkers, null, 2));
                   setCopyStatus("Copied! ✅");
                   setTimeout(() => setCopyStatus("Copy JSON"), 2000);
                 }} style={{ background: '#ebf8ff', color: '#2b6cb0', border: '1px solid #bee3f8' }}>
@@ -391,7 +401,7 @@ const Vector = () => {
                 </button>
 
                 <button className="export-btn json" onClick={() => {
-                  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(markers, null, 2));
+                  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(finalMarkers, null, 2));
                   const downloadAnchorNode = document.createElement('a');
                   downloadAnchorNode.setAttribute("href",     dataStr);
                   downloadAnchorNode.setAttribute("download", "inspection_data.json");
@@ -421,7 +431,7 @@ const Vector = () => {
                     <tbody>
                       {(() => {
                         const grouped = {};
-                        Object.values(markers).forEach(m => {
+                        Object.values(finalMarkers).forEach(m => {
                           if (!grouped[m.pathId]) {
                             grouped[m.pathId] = { 
                               partName: m.partName, 
@@ -491,13 +501,13 @@ const Vector = () => {
                   <div className="json-header">
                     <h4>JSON Output (Backend Ready)</h4>
                     <button className="copy-json-inline" onClick={() => {
-                      navigator.clipboard.writeText(JSON.stringify(markers, null, 2));
+                      navigator.clipboard.writeText(JSON.stringify(finalMarkers, null, 2));
                       setCopyStatus("Copied! ✅");
                       setTimeout(() => setCopyStatus("Copy JSON"), 2000);
                     }}>{copyStatus}</button>
                   </div>
                   <pre className="json-preview full-height">
-                    {JSON.stringify(markers, null, 2)}
+                    {JSON.stringify(finalMarkers, null, 2)}
                   </pre>
                 </div>
               )}
