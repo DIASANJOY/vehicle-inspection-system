@@ -158,7 +158,14 @@ const Vector = () => {
                 onMouseOver={handleHover}
               />
               
-              {Object.keys(markers).map(id => {
+              {Object.keys(markers)
+              .sort((a, b) => {
+                // Taruh marker yang terpilih di urutan terakhir agar selalu di atas (z-index SVG)
+                if (a == selectedMarkerId) return 1;
+                if (b == selectedMarkerId) return -1;
+                return 0;
+              })
+              .map(id => {
                 const m = markers[id];
                 if (m.view !== view) return null;
                 return (
