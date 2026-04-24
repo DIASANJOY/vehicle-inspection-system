@@ -25,10 +25,7 @@ const Vector = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
 
-  // Save to localStorage
-  React.useEffect(() => {
-    localStorage.setItem('vehicle_markers', JSON.stringify(markers));
-  }, [markers]);
+  // Save to localStorage dihilangkan agar tidak otomatis tersimpan
 
   const handleAction = (e) => {
     if (activePopup || !activeTool) return; 
@@ -341,11 +338,12 @@ const Vector = () => {
             {showDataView ? "📊 KEMBALI KE VISUAL" : "📋 LIHAT DATA TABLE"}
           </button>
           <button className="footer-bar submit-bar" onClick={() => {
-            // Simulasi pengiriman data
-            console.log("Exporting markers:", markers);
-            alert("✅ Laporan Inspeksi Berhasil Dikirim!");
+            // Simpan ke localStorage hanya saat tombol ini diklik
+            localStorage.setItem('vehicle_markers', JSON.stringify(markers));
+            console.log("Data saved to storage and exported:", markers);
+            alert("✅ Data berhasil disimpan ke memori dan laporan siap dikirim!");
           }}>
-            📩 KIRIM / EXPORT DATA
+            📩 SIMPAN & KIRIM DATA
           </button>
         </div>
       </div>
