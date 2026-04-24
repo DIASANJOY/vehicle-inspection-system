@@ -54,6 +54,20 @@ const Vector = () => {
     point.y = e.clientY;
     const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
+    // --- FITUR BARU: CEK JARAK (ANTI-STACKING) ---
+    const minDistance = 25; // Jarak minimal antar marker
+    const isTooClose = Object.values(markers).some(m => {
+      if (m.view !== view) return false;
+      const dx = m.x - transformedPoint.x;
+      const dy = m.y - transformedPoint.y;
+      return Math.sqrt(dx * dx + dy * dy) < minDistance;
+    });
+
+    if (isTooClose) {
+      // Tidak munculkan alert agar tidak mengganggu, cukup batalkan aksi
+      return;
+    }
+
     // Hitung persentase relatif untuk tabel data
     const currentVB = view === 'front' ? { w: 700.72, h: 568.24 } : { w: 674.58, h: 595.24 };
     const relX = Math.round((transformedPoint.x / currentVB.w) * 100);
@@ -460,7 +474,13 @@ const Vector = () => {
                             </td>
                             <td>{panel.count} tanda</td>
                             <td className="note-cell">
-                              {panel.notes.length > 0 ? panel.notes.join(" | ") : "-"}
+                              {panel.notes.length > 0 ? (
+                                <ul className="table-notes-list">
+                                  {panel.notes.map((n, i) => (
+                                    <li key={i}>{n}</li>
+                                  ))}
+                                </ul>
+                              ) : "-"}
                             </td>
                           </tr>
                         ));
