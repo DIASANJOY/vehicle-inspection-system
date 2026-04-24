@@ -76,7 +76,8 @@ const Vector = () => {
         ...prev,
         [id]: { ...prev[id], type: activeTool }
       }));
-      setSelectedMarkerId(id);
+      // Toggle selection: jika sudah terpilih, maka tutup (null)
+      setSelectedMarkerId(prev => prev == id ? null : id);
     }
   };
 
@@ -202,8 +203,8 @@ const Vector = () => {
 
                     {/* Balon Teks Catatan saat terpilih */}
                     {selectedMarkerId == id && m.note && (
-                      <g transform="translate(0, -95)">
-                        <foreignObject x="-80" y="-50" width="160" height="70" style={{ overflow: 'visible' }}>
+                      <g transform="translate(0, -40)">
+                        <foreignObject x="-80" y="-45" width="160" height="70" style={{ overflow: 'visible' }}>
                           <div xmlns="http://www.w3.org/1999/xhtml" className="marker-note-bubble">
                             {m.note}
                             <div className="bubble-arrow"></div>
