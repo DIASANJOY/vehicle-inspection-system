@@ -33,10 +33,15 @@ const Vector = () => {
   const handleAction = (e) => {
     if (activePopup || !activeTool) return; 
     
-    if (activeTool === 'delete') return; // Klik di area kosong tidak melakukan apa-apa jika alat hapus aktif
+    if (activeTool === 'delete') return; 
 
     const path = e.target.closest('[id]');
-    const markersOnPart = Object.values(markers).filter(m => m.pathId === path?.id && m.view === view).length;
+    
+    // Cegah error jika klik background atau bagian yang dilarang
+    const excludedIds = ["SUV", "suv-front", "suv-back", "base", "items", "utilities", "base-body", "rear-body"];
+    if (!path || excludedIds.includes(path.id)) return;
+
+    const markersOnPart = Object.values(markers).filter(m => m.pathId === path.id && m.view === view).length;
     
     if (markersOnPart >= 4) {
       alert(`Maksimal 4 tanda pada bagian ${path.id.toUpperCase()} diperbolehkan.`);
@@ -49,15 +54,27 @@ const Vector = () => {
     point.y = e.clientY;
     const transformedPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
+    // Hitung persentase relatif untuk tabel data
+    const currentVB = view === 'front' ? { w: 700.72, h: 568.24 } : { w: 674.58, h: 595.24 };
+    const relX = Math.round((transformedPoint.x / currentVB.w) * 100);
+    const relY = Math.round((transformedPoint.y / currentVB.h) * 100);
+
     const newId = Date.now();
     setMarkers(prev => ({
       ...prev,
       [newId]: { 
-        id: newId, view, type: activeTool, x: transformedPoint.x, y: transformedPoint.y, 
-        note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
+        id: newId, 
+        view, 
+        type: activeTool, 
+        x: transformedPoint.x, 
+        y: transformedPoint.y,
+        relX, // Simpan untuk tabel
+        relY, // Simpan untuk tabel
+        note: "", 
+        pathId: path.id, 
+        partName: path.id.replace(/-/g, ' ').toUpperCase() 
       }
     }));
-    // Jangan otomatis setSelectedMarkerId(newId) agar tidak mengganggu fokus
   };
 
 
@@ -405,8 +422,8 @@ const Vector = () => {
                             };
                           }
                           grouped[m.pathId].count++;
-                          grouped[m.pathId].sumX += m.relX;
-                          grouped[m.pathId].sumY += m.relY;
+                          grouped[m.pathId].sumX += m.relX || 0;
+                          grouped[m.pathId].sumY += m.relY || 0;
                           if (m.type === 'cross') grouped[m.pathId].type = 'cross';
                           if (m.note) grouped[m.pathId].notes.push(m.note);
                         });
