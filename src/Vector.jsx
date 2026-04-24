@@ -25,15 +25,13 @@ const Vector = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
 
-  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
-
   // Save to localStorage
   React.useEffect(() => {
     localStorage.setItem('vehicle_markers', JSON.stringify(markers));
   }, [markers]);
 
   const handleAction = (e) => {
-    if (activePopup) return; 
+    if (activePopup || !activeTool) return; 
     
     if (activeTool === 'delete') return; // Klik di area kosong tidak melakukan apa-apa jika alat hapus aktif
 
@@ -59,7 +57,7 @@ const Vector = () => {
         note: "", pathId: path.id, partName: path.id.replace(/-/g, ' ').toUpperCase() 
       }
     }));
-    setSelectedMarkerId(newId);
+    // Jangan otomatis setSelectedMarkerId(newId) agar tidak mengganggu fokus
   };
 
   const handlePointerUp = () => {};
@@ -145,20 +143,22 @@ const Vector = () => {
           <div className="badge">{view === 'front' ? 'FRONT PANEL' : 'REAR PANEL'}</div>
 
           <div 
-          className="svg-container" 
-          style={{ transform: `scale(${zoomLevel})`, transition: 'transform 0.2s' }}
-          onContextMenu={(e) => e.preventDefault()}
-        >
-            <CurrentSVG
-              className="car-svg"
-              onClick={handleAction}
-              onPointerDown={handlePointerDown}
-              onPointerUp={handlePointerUp}
-              onPointerLeave={handlePointerUp}
-              onMouseOver={handleHover}
-            />
-
-            <svg viewBox={viewBox} className="marker-overlay">
+            className="svg-container" 
+            style={{ 
+              width: `${100 * zoomLevel}%`, 
+              maxWidth: `${700 * zoomLevel}px`,
+              transition: 'width 0.2s, max-width 0.2s' 
+            }}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            <svg viewBox={viewBox} style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}>
+              <CurrentSVG
+                width="100%"
+                height="100%"
+                onClick={handleAction}
+                onMouseOver={handleHover}
+              />
+              
               {Object.keys(markers).map(id => {
                 const m = markers[id];
                 if (m.view !== view) return null;
@@ -167,81 +167,45 @@ const Vector = () => {
                     key={id}
                     transform={`translate(${m.x}, ${m.y})`}
                     onClick={(e) => handleActionOnMarker(e, id)}
-                    className={`marker-group ${selectedMarkerId === id ? 'selected' : ''}`}
+                    style={{ cursor: 'pointer', pointerEvents: 'all' }}
+                    className={`marker-group ${selectedMarkerId == id ? 'selected' : ''}`}
                   >
-                    {selectedMarkerId === id && (
-                      <circle className="marker-glow" r="30" fill="rgba(255, 107, 107, 0.4)" />
+                    {selectedMarkerId == id && (
+                      <g className="selection-indicators">
+                        <circle className="marker-glow" r="60" fill="rgba(49, 130, 206, 0.25)" />
+                        <circle className="marker-selection-indicator" r="50" strokeWidth="8" />
+                      </g>
                     )}
-                    <circle r="22" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="3" />
+                    
+                    <circle r="28" fill="white" stroke={m.type === 'tick' ? '#28a745' : '#dc3545'} strokeWidth="5" />
                     <text
-                      className={`symbol ${m.type}`}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       dy=".1em"
-                      fontSize="18px"
+                      fontSize="24px"
                       fontWeight="bold"
+                      fill={m.type === 'tick' ? '#28a745' : '#dc3545'}
+                      style={{ pointerEvents: 'none', userSelect: 'none' }}
                     >
                       {m.type === 'tick' ? '✓' : '✕'}
                     </text>
-                    {/* Indikator Pesan/Catatan (Balon Kecil) */}
+
                     {m.note && (
-                      <g transform="translate(15, -15)">
-                        <circle r="8" fill="#3182ce" stroke="white" strokeWidth="1.5" />
-                        <text fill="white" fontSize="8" textAnchor="middle" dominantBaseline="middle">✉</text>
+                      <g transform="translate(22, -22)">
+                        <circle r="18" fill="#3182ce" stroke="white" strokeWidth="3" />
+                        <text 
+                          fill="white" 
+                          fontSize="18px" 
+                          textAnchor="middle" 
+                          dominantBaseline="middle"
+                          style={{ pointerEvents: 'none' }}
+                        >✉</text>
                       </g>
                     )}
                   </g>
                 );
               })}
             </svg>
-            
-            {activePopup && (
-              <>
-                <div
-                  className="popup-overlay"
-                  onClick={() => setActivePopup(null)}
-                />
-                <div
-                  className="quick-popup"
-                  style={{
-                    position: 'absolute',
-                    left: `${(activePopup.x / (view === 'front' ? 700.72 : 674.58)) * 100}%`,
-                    top: `${(activePopup.y / (view === 'front' ? 568.24 : 595.24)) * 100}%`,
-                    transform: `translate(-50%, ${activePopup.y < 300 ? '25px' : '-105%'})`,
-                    zIndex: 100
-                  }}
-                >
-                  <div className="popup-header">
-                    <span>{activePopup.partName}</span>
-                    <button onClick={() => setActivePopup(null)}>✕</button>
-                  </div>
-                  <div className="popup-body">
-                    <div className="popup-status-selector">
-                      <button
-                        className={`status-btn tick ${markers[activePopup.id]?.type === 'tick' ? 'active' : ''}`}
-                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'tick' } }))}
-                      >✓ LULUS</button>
-                      <button
-                        className={`status-btn cross ${markers[activePopup.id]?.type === 'cross' ? 'active' : ''}`}
-                        onClick={() => setMarkers(prev => ({ ...prev, [activePopup.id]: { ...prev[activePopup.id], type: 'cross' } }))}
-                      >✕ CACAT</button>
-                    </div>
-                    <div className="notes-input-group">
-                      <label className="notes-label">📩 ISI CATATAN:</label>
-                      <textarea
-                        className="popup-textarea"
-                        value={markers[activePopup.id]?.note || ""}
-                        onChange={(e) => handleNoteChange(activePopup.id, e.target.value)}
-                        autoFocus
-                      />
-                    </div>
-                    <div className="popup-footer">
-                      <button className="popup-save-btn" onClick={() => setActivePopup(null)}>SIMPAN</button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </div>
 
@@ -253,9 +217,18 @@ const Vector = () => {
       </div>
 
       <div className="tools-panel">
-        <button className={`tool-btn tick ${activeTool === 'tick' ? 'active' : ''}`} onClick={() => setActiveTool('tick')}>✓</button>
-        <button className={`tool-btn cross ${activeTool === 'cross' ? 'active' : ''}`} onClick={() => setActiveTool('cross')}>✕</button>
-        <button className={`tool-btn delete ${activeTool === 'delete' ? 'active' : ''}`} onClick={() => setActiveTool('delete')}>🗑</button>
+        <button 
+          className={`tool-btn tick ${activeTool === 'tick' ? 'active' : ''}`} 
+          onClick={() => setActiveTool(prev => prev === 'tick' ? null : 'tick')}
+        >✓</button>
+        <button 
+          className={`tool-btn cross ${activeTool === 'cross' ? 'active' : ''}`} 
+          onClick={() => setActiveTool(prev => prev === 'cross' ? null : 'cross')}
+        >✕</button>
+        <button 
+          className={`tool-btn delete ${activeTool === 'delete' ? 'active' : ''}`} 
+          onClick={() => setActiveTool(prev => prev === 'delete' ? null : 'delete')}
+        >🗑</button>
       </div>
 
       <div className="inspection-form-container">
@@ -275,20 +248,28 @@ const Vector = () => {
               <div className="panel-header">{panel.name}</div>
               <div className="markers-list">
                 {panel.items.map((item, i) => (
-                  <div key={item.id} className={`marker-item-row ${selectedMarkerId === item.id ? 'active' : ''}`}>
-                    <div className="marker-main-info" onClick={() => setSelectedMarkerId(item.id === selectedMarkerId ? null : item.id)}>
+                  <div 
+                    key={item.id} 
+                    className={`marker-item-row ${selectedMarkerId == item.id ? 'active' : ''}`}
+                    onClick={() => setSelectedMarkerId(prev => prev == item.id ? null : item.id)}
+                  >
+                    <div className="marker-main-info">
                       <span className="marker-index">{i + 1}.</span>
-                      <span className={`marker-type-icon ${item.type}`}>{item.type === 'tick' ? '✓' : '✕'}</span>
-                      <span className="marker-coords">COORD: {Math.round(item.x)}, {Math.round(item.y)}</span>
+                      <div className={`marker-type-icon ${item.type}`}>
+                        {item.type === 'tick' ? '✓' : '✕'}
+                      </div>
+                      <div className="marker-coords">
+                        COORD: {Math.round(item.x)}, {Math.round(item.y)}
+                      </div>
                     </div>
-                    {selectedMarkerId === item.id && (
-                      <div className="marker-note-input-wrapper">
+
+                    {selectedMarkerId == item.id && (
+                      <div className="marker-note-input-wrapper" onClick={(e) => e.stopPropagation()}>
                         <textarea 
                           placeholder="Tambahkan catatan khusus untuk bagian ini..."
                           value={item.note}
                           onChange={(e) => handleNoteChange(item.id, e.target.value)}
                           className="marker-textarea"
-                          autoFocus
                         />
                       </div>
                     )}
