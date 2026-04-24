@@ -60,8 +60,6 @@ const Vector = () => {
     // Jangan otomatis setSelectedMarkerId(newId) agar tidak mengganggu fokus
   };
 
-  const handlePointerUp = () => {};
-  const handlePointerDown = () => {};
 
   const handleActionOnMarker = (e, id) => {
     e.stopPropagation();
@@ -199,6 +197,18 @@ const Vector = () => {
                           dominantBaseline="middle"
                           style={{ pointerEvents: 'none' }}
                         >✉</text>
+                      </g>
+                    )}
+
+                    {/* Balon Teks Catatan saat terpilih */}
+                    {selectedMarkerId == id && m.note && (
+                      <g transform="translate(0, -95)">
+                        <foreignObject x="-80" y="-50" width="160" height="70" style={{ overflow: 'visible' }}>
+                          <div xmlns="http://www.w3.org/1999/xhtml" className="marker-note-bubble">
+                            {m.note}
+                            <div className="bubble-arrow"></div>
+                          </div>
+                        </foreignObject>
                       </g>
                     )}
                   </g>
