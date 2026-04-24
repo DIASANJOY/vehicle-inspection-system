@@ -172,8 +172,7 @@ const Vector = () => {
                   >
                     {selectedMarkerId == id && (
                       <g className="selection-indicators">
-                        <circle className="marker-glow" r="60" fill="rgba(49, 130, 206, 0.25)" />
-                        <circle className="marker-selection-indicator" r="50" strokeWidth="8" />
+                        <circle className="marker-glow" r="50" fill="rgba(49, 130, 206, 0.25)" />
                       </g>
                     )}
                     
